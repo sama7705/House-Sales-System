@@ -69,42 +69,31 @@
 </form>
 
 <% if (properties.length === 0) { %>
-  <p>No properties found.</p>
+  <div class="empty-state">No properties available</div>
 <% } else { %>
-  <table>
-    <thead>
-      <tr>
-        <th>Image</th>
-        <th>Title</th>
-        <th>Location</th>
-        <th>Type</th>
-        <th>Beds/Baths</th>
-        <th>Area</th>
-        <th>Price</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% properties.forEach((property) => { %>
-        <tr>
-          <td>
-            <% if (property.image_url) { %>
-              <img src="<%= property.image_url %>" alt="<%= property.title %>" class="property-thumb" />
-            <% } else { %>
-              <div class="image-placeholder">No Image</div>
-            <% } %>
-          </td>
-          <td><a href="/properties/<%= property.id %>"><%= property.title %></a></td>
-          <td><%= property.location %></td>
-          <td><%= property.type %></td>
-          <td><%= property.bedrooms %> / <%= property.bathrooms %></td>
-          <td><%= Number(property.area).toFixed(2) %> m²</td>
-          <td>$<%= Number(property.price).toFixed(2) %></td>
-          <td>
+  <section class="property-grid">
+    <% properties.forEach((property) => { %>
+      <article class="property-card">
+        <% if (property.image_url) { %>
+          <img src="<%= property.image_url %>" alt="<%= property.title %>" class="property-thumb" />
+        <% } else { %>
+          <div class="image-placeholder card-placeholder">No Image</div>
+        <% } %>
+
+        <div class="property-content">
+          <div class="card-header-row">
+            <h3><%= property.title %></h3>
             <span class="status <%= property.status.toLowerCase() %>"><%= property.status %></span>
-          </td>
-          <td class="actions">
+          </div>
+
+          <p class="meta"><strong>Location:</strong> <%= property.location %></p>
+          <p class="meta"><strong>Type:</strong> <%= property.type %></p>
+          <p class="meta"><strong>Bedrooms / Bathrooms:</strong> <%= property.bedrooms %> / <%= property.bathrooms %></p>
+          <p class="price">$<%= Number(property.price).toFixed(2) %></p>
+
+          <div class="actions">
+            <a href="/properties/<%= property.id %>" class="btn-link">View Details</a>
+
             <% if (isLoggedIn) { %>
               <% if (property.status === 'Available') { %>
                 <form action="/sold/<%= property.id %>" method="POST">
@@ -115,14 +104,12 @@
               <form action="/delete/<%= property.id %>" method="POST">
                 <button type="submit" class="delete">Delete</button>
               </form>
-            <% } else { %>
-              <span class="muted">Login required</span>
             <% } %>
-          </td>
-        </tr>
-      <% }) %>
-    </tbody>
-  </table>
+          </div>
+        </div>
+      </article>
+    <% }) %>
+  </section>
 <% } %>
 
 <%- include('partials/footer') %>
