@@ -88,6 +88,74 @@ function isInvalidPrice(price) {
  *         error:
  *           type: string
  *           example: House not found
+ *   responses:
+ *     HousesListResponse:
+ *       description: Houses fetched successfully.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: array
+ *             items:
+ *               $ref: '#/components/schemas/House'
+ *           example:
+ *             - id: 2
+ *               title: Downtown Loft
+ *               location: Seattle, WA
+ *               price: 615000
+ *               status: Available
+ *             - id: 1
+ *               title: Family Retreat
+ *               location: Austin, TX
+ *               price: 450000
+ *               status: Sold
+ *     HouseResponse:
+ *       description: House fetched successfully.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/House'
+ *           example:
+ *             id: 1
+ *             title: Family Retreat
+ *             location: Austin, TX
+ *             price: 450000
+ *             status: Available
+ *     HouseCreatedResponse:
+ *       description: House created successfully.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/House'
+ *           example:
+ *             id: 3
+ *             title: Cozy Cottage
+ *             location: Denver, CO
+ *             price: 325000
+ *             status: Available
+ *     MessageResponse:
+ *       description: Request completed successfully.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ApiMessage'
+ *           example:
+ *             message: House deleted successfully
+ *     MissingFieldsError:
+ *       description: Bad Request - missing or invalid required fields.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ApiError'
+ *           example:
+ *             error: Title, location, and valid price are required.
+ *     HouseNotFoundError:
+ *       description: Not Found - house with the provided id does not exist.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ApiError'
+ *           example:
+ *             error: House not found
  */
 
 /**
@@ -245,13 +313,7 @@ router.post('/delete/:id', (req, res) => {
  *     description: Returns all houses as JSON for API testing in Swagger.
  *     responses:
  *       200:
- *         description: Houses fetched successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/House'
+ *         $ref: '#/components/responses/HousesListResponse'
  *       500:
  *         description: Database error.
  *         content:
@@ -283,17 +345,9 @@ router.get('/api/houses', (req, res) => {
  *           type: integer
  *     responses:
  *       200:
- *         description: House fetched successfully.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/House'
+ *         $ref: '#/components/responses/HouseResponse'
  *       404:
- *         description: House not found.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiError'
+ *         $ref: '#/components/responses/HouseNotFoundError'
  */
 router.get('/api/houses/:id', (req, res) => {
   const db = req.db;
@@ -327,17 +381,9 @@ router.get('/api/houses/:id', (req, res) => {
  *             $ref: '#/components/schemas/HouseInput'
  *     responses:
  *       201:
- *         description: House created successfully.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/House'
+ *         $ref: '#/components/responses/HouseCreatedResponse'
  *       400:
- *         description: Validation error.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiError'
+ *         $ref: '#/components/responses/MissingFieldsError'
  */
 router.post('/api/houses', (req, res) => {
   const db = req.db;
@@ -387,15 +433,11 @@ router.post('/api/houses', (req, res) => {
  *             $ref: '#/components/schemas/HousePatchInput'
  *     responses:
  *       200:
- *         description: House updated successfully.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/House'
+ *         $ref: '#/components/responses/HouseResponse'
  *       400:
- *         description: Validation error.
+ *         $ref: '#/components/responses/MissingFieldsError'
  *       404:
- *         description: House not found.
+ *         $ref: '#/components/responses/HouseNotFoundError'
  */
 router.patch('/api/houses/:id', (req, res) => {
   const db = req.db;
@@ -464,13 +506,9 @@ router.patch('/api/houses/:id', (req, res) => {
  *         example: 1
  *     responses:
  *       200:
- *         description: House marked as sold.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessage'
+ *         $ref: '#/components/responses/MessageResponse'
  *       404:
- *         description: House not found.
+ *         $ref: '#/components/responses/HouseNotFoundError'
  *       500:
  *         description: Database error.
  */
@@ -507,13 +545,9 @@ router.patch('/api/houses/:id/sold', (req, res) => {
  *         example: 1
  *     responses:
  *       200:
- *         description: House deleted successfully.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiMessage'
+ *         $ref: '#/components/responses/MessageResponse'
  *       404:
- *         description: House not found.
+ *         $ref: '#/components/responses/HouseNotFoundError'
  *       500:
  *         description: Database error.
  */
