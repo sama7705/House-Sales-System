@@ -1,6 +1,8 @@
 const path = require('path');
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
 const houseRoutes = require('./routes/houses');
 
@@ -22,10 +24,31 @@ db.serialize(() => {
   `);
 });
 
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'House Sales System API',
+      version: '1.0.0',
+      description: 'Beginner-friendly Swagger docs for the House Sales System.'
+    },
+    servers: [
+      {
+        url: `http://localhost:${PORT}`,
+        description: 'Local development server'
+      }
+    ]
+  },
+  apis: [path.join(__dirname, 'routes/*.js')]
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
@@ -33,8 +56,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/', houseRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
+  console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
 });
