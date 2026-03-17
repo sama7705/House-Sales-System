@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Available Houses</h2>
+
+{% if houses %}
+    <ul>
+        {% for house in houses %}
+            <li>{{ house.title }} - ${{ house.price }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No houses added yet.</p>
+{% endif %}
+{% endblock %}

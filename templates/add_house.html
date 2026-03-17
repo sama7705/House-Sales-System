@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Add a House</h2>
+
+<form method="post">
+    <label for="title">House Title:</label>
+    <input type="text" id="title" name="title" required>
+
+    <label for="price">Price:</label>
+    <input type="text" id="price" name="price" required>
+
+    <button type="submit">Save</button>
+</form>
+{% endblock %}
