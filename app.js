@@ -1,5 +1,6 @@
 const path = require('path');
 const express = require('express');
+const session = require('express-session');
 const sqlite3 = require('sqlite3').verbose();
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
@@ -52,8 +53,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(
+  session({
+    secret: 'house-sales-secret',
+    resave: false,
+    saveUninitialized: false
+  })
+);
+
 app.use((req, res, next) => {
   req.db = db;
+  res.locals.isLoggedIn = Boolean(req.session.user);
   next();
 });
 

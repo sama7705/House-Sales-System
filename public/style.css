@@ -15,11 +15,26 @@ body {
   margin: 0 0 8px;
 }
 
-.header nav a {
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.top-nav a {
   color: white;
-  margin-right: 12px;
   text-decoration: none;
   font-weight: bold;
+}
+
+.inline-form {
+  margin: 0;
+}
+
+.nav-button {
+  background: transparent;
+  border: 1px solid white;
+  padding: 6px 10px;
 }
 
 .container {
@@ -90,4 +105,14 @@ input {
 .error {
   color: #c0392b;
   font-weight: bold;
+}
+
+.info {
+  background: #eef4fa;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.muted {
+  color: #777;
 }

@@ -26,340 +26,127 @@ http://localhost:3000
 
 ## Manual Testing (Browser)
 
-### 1) Listing houses
+### 1) Public listing still works
 
 1. Open `http://localhost:3000/`.
-2. Confirm the table/page loads.
+2. Confirm the table/page loads without login.
 3. Expected result:
    - Existing houses are shown.
-   - If there are no houses yet, list is empty but page still works.
+   - Add and management actions are hidden/disabled for guests.
 
-### 2) Adding a house
+### 2) Login success
 
-1. Open `http://localhost:3000/add`.
-2. Fill in the form:
+1. Open `http://localhost:3000/login`.
+2. Sign in with:
+   - Email: `admin@example.com`
+   - Password: `admin123`
+3. Expected result:
+   - Redirect to `/`.
+   - Navigation now shows **Add House** and **Logout**.
+
+### 3) Login failure
+
+1. Open `http://localhost:3000/login`.
+2. Enter wrong credentials.
+3. Expected result:
+   - Stay on login page.
+   - Error: `Invalid email or password.`
+
+### 4) Route protection
+
+1. Log out (or use an incognito window).
+2. Try opening `http://localhost:3000/add`.
+3. Expected result:
+   - Redirect to `/login`.
+
+### 5) Adding a house (admin only)
+
+1. Login as admin.
+2. Open `http://localhost:3000/add`.
+3. Fill in the form:
    - Title: `Sunny Villa`
    - Location: `Miami, FL`
    - Price: `550000`
-3. Submit.
+4. Submit.
+5. Expected result:
+   - Redirect to `/`.
+   - New house appears with status **Available**.
+
+### 6) Marking a house as sold (admin only)
+
+1. Login as admin.
+2. On home page (`/`), choose a house.
+3. Click **Mark as Sold**.
 4. Expected result:
-   - You are redirected to `/`.
-   - New house appears in the list with status **Available**.
-
-### 3) Marking a house as sold
-
-1. On home page (`/`), choose a house.
-2. Click the **Sold** action/button for that row.
-3. Expected result:
    - Page reloads.
    - House status changes to **Sold**.
 
-### 4) Deleting a house
+### 7) Deleting a house (admin only)
 
-1. On home page (`/`), choose a house.
-2. Click **Delete**.
-3. Expected result:
+1. Login as admin.
+2. On home page (`/`), choose a house.
+3. Click **Delete**.
+4. Expected result:
    - Page reloads.
    - House is removed from the list.
 
----
+### 8) Logout
 
-## API Testing with Swagger UI (Step-by-Step)
-
-### Open Swagger UI
-
-1. Make sure the server is running (`npm start`).
-2. Open:
-
-```text
-http://localhost:3000/api-docs
-```
-
-3. Expand the **API** tag section.
-4. For each endpoint, click **Try it out**, provide values, then click **Execute**.
-
-### Recommended execution flow
-
-Use these endpoints in order so each step has data from the previous step:
-
-1. `GET /api/houses` (baseline list)
-2. `POST /api/houses` (create a test house)
-3. `GET /api/houses/{id}` (verify created house)
-4. `PATCH /api/houses/{id}` (partial update test)
-5. `PATCH /api/houses/{id}/sold` (mark sold)
-6. `DELETE /api/houses/{id}` (cleanup)
-
-> Tip: Copy the `id` returned by `POST /api/houses`; you will reuse it in later requests.
-
-### Example JSON request bodies
-
-#### `POST /api/houses`
-
-```json
-{
-  "title": "City Apartment",
-  "location": "Austin, TX",
-  "price": 320000
-}
-```
-
-#### `PATCH /api/houses/{id}` (update one or more fields)
-
-```json
-{
-  "price": 335000,
-  "status": "Available"
-}
-```
-
-#### Alternative `PATCH /api/houses/{id}` example
-
-```json
-{
-  "title": "City Apartment - Renovated",
-  "location": "Austin, TX",
-  "price": 350000,
-  "status": "Sold"
-}
-```
-
-### Expected responses
-
-#### `GET /api/houses`
-
-- Status: `200 OK`
-- Body (array, may be empty):
-
-```json
-[
-  {
-    "id": 1,
-    "title": "City Apartment",
-    "location": "Austin, TX",
-    "price": 320000,
-    "status": "Available"
-  }
-]
-```
-
-#### `POST /api/houses`
-
-- Status: `201 Created`
-- Body:
-
-```json
-{
-  "id": 2,
-  "title": "City Apartment",
-  "location": "Austin, TX",
-  "price": 320000,
-  "status": "Available"
-}
-```
-
-#### `GET /api/houses/{id}`
-
-- Status: `200 OK` when id exists
-- Body:
-
-```json
-{
-  "id": 2,
-  "title": "City Apartment",
-  "location": "Austin, TX",
-  "price": 320000,
-  "status": "Available"
-}
-```
-
-#### `PATCH /api/houses/{id}`
-
-- Status: `200 OK`
-- Body (updated object):
-
-```json
-{
-  "id": 2,
-  "title": "City Apartment - Renovated",
-  "location": "Austin, TX",
-  "price": 350000,
-  "status": "Sold"
-}
-```
-
-#### `PATCH /api/houses/{id}/sold`
-
-- Status: `200 OK`
-- Body:
-
-```json
-{
-  "message": "House marked as sold"
-}
-```
-
-#### `DELETE /api/houses/{id}`
-
-- Status: `200 OK`
-- Body:
-
-```json
-{
-  "message": "House deleted successfully"
-}
-```
+1. While logged in, click **Logout**.
+2. Expected result:
+   - Redirect to `/login`.
+   - Protected pages are no longer available until login.
 
 ---
 
-## Edge Cases to Test
+## API Testing with Swagger UI
 
-### 1) Empty fields
+The JSON API endpoints are unchanged and still public.
 
-#### Browser form (`POST /add`)
+1. Make sure server is running (`npm start`).
+2. Open `http://localhost:3000/api-docs`.
+3. Test API routes under the **API** tag.
+4. You can also view new web auth route docs under the **Web** tag:
+   - `GET /login`
+   - `POST /login`
+   - `POST /logout`
 
-1. Open `http://localhost:3000/add`.
-2. Leave **Title**, **Location**, and/or **Price** blank.
-3. Submit.
-4. Expected result: validation error on the form (`400`).
+---
 
-#### API (`POST /api/houses`)
+## Quick cURL Checks for Login/Logout
 
-Use this invalid request body:
+Use these commands in another terminal while server is running.
 
-```json
-{
-  "title": "",
-  "location": "",
-  "price": ""
-}
+### Login with valid credentials
+
+```bash
+curl -i -c cookie.txt -X POST http://localhost:3000/login \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "email=admin@example.com&password=admin123"
 ```
 
-Expected response:
+Expected: `302` redirect to `/` and session cookie saved.
 
-- Status: `400 Bad Request`
-- Body:
+### Access protected route with session cookie
 
-```json
-{
-  "error": "Title, location, and valid price are required."
-}
+```bash
+curl -i -b cookie.txt http://localhost:3000/add
 ```
 
-### 2) Invalid ID
+Expected: `200` with add-house HTML.
 
-Use a non-existent id such as `999999`.
+### Logout
 
-#### `GET /api/houses/{id}`
-
-- Request: `GET /api/houses/999999`
-- Expected:
-  - Status: `404 Not Found`
-  - Body:
-
-```json
-{
-  "error": "House not found"
-}
+```bash
+curl -i -b cookie.txt -X POST http://localhost:3000/logout
 ```
 
-#### `PATCH /api/houses/{id}`
+Expected: `302` redirect to `/login`.
 
-- Request: `PATCH /api/houses/999999`
-- Example body:
+### Protected route without login
 
-```json
-{
-  "status": "Sold"
-}
+```bash
+curl -i http://localhost:3000/add
 ```
 
-- Expected:
-  - Status: `404 Not Found`
-  - Body:
-
-```json
-{
-  "error": "House not found"
-}
-```
-
-#### `PATCH /api/houses/{id}/sold`
-
-- Request: `PATCH /api/houses/999999/sold`
-- Expected:
-  - Status: `404 Not Found`
-  - Body:
-
-```json
-{
-  "error": "House not found"
-}
-```
-
-#### `DELETE /api/houses/{id}`
-
-- Request: `DELETE /api/houses/999999`
-- Expected:
-  - Status: `404 Not Found`
-  - Body:
-
-```json
-{
-  "error": "House not found"
-}
-```
-
-### 3) Additional negative API checks (optional but recommended)
-
-#### Missing patch fields
-
-- Request: `PATCH /api/houses/{id}` with empty body `{}`
-- Expected:
-  - Status: `400 Bad Request`
-  - Body:
-
-```json
-{
-  "error": "Provide at least one field to update."
-}
-```
-
-#### Invalid patch status
-
-- Request body:
-
-```json
-{
-  "status": "Pending"
-}
-```
-
-- Expected:
-  - Status: `400 Bad Request`
-  - Body:
-
-```json
-{
-  "error": "Status must be Available or Sold."
-}
-```
-
-#### Invalid patch price
-
-- Request body:
-
-```json
-{
-  "price": "not-a-number"
-}
-```
-
-- Expected:
-  - Status: `400 Bad Request`
-  - Body:
-
-```json
-{
-  "error": "Price must be a valid number."
-}
-```
+Expected: `302` redirect to `/login`.
