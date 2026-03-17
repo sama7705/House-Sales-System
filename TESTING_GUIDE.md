@@ -1,152 +1,85 @@
 # Testing Guide
 
-This guide shows practical manual and API tests for first-time users.
-
-## Before You Start
-
-1. Install dependencies:
+## Setup
 
 ```bash
 npm install
-```
-
-2. Start the server:
-
-```bash
 npm start
 ```
 
-3. Open the app in browser:
+Open `http://localhost:3000`.
 
-```text
-http://localhost:3000
-```
+## Manual Browser Tests
 
----
+1. **Guest access**
+   - Open `/`.
+   - Property list should load.
+   - Guest cannot add/sell/delete.
 
-## Manual Testing (Browser)
+2. **Login success**
+   - Open `/login` and use:
+     - `admin@example.com`
+     - `admin123`
+   - Should redirect to `/`.
 
-### 1) Public listing still works
+3. **Add property**
+   - Open `/add-property`.
+   - Submit all required fields (title, location, price, type, bedrooms, bathrooms, area).
+   - Should redirect to `/` and show new property as Available.
 
-1. Open `http://localhost:3000/`.
-2. Confirm the table/page loads without login.
-3. Expected result:
-   - Existing houses are shown.
-   - Add and management actions are hidden/disabled for guests.
+4. **Property details**
+   - Click a property title on `/`.
+   - `/properties/:id` should show full details including description.
 
-### 2) Login success
+5. **Mark as sold**
+   - Click **Mark as Sold**.
+   - Status should become Sold.
 
-1. Open `http://localhost:3000/login`.
-2. Sign in with:
-   - Email: `admin@example.com`
-   - Password: `admin123`
-3. Expected result:
-   - Redirect to `/`.
-   - Navigation now shows **Add House** and **Logout**.
+6. **Delete property**
+   - Click **Delete**.
+   - Property should disappear from the list.
 
-### 3) Login failure
+## API Checks (cURL)
 
-1. Open `http://localhost:3000/login`.
-2. Enter wrong credentials.
-3. Expected result:
-   - Stay on login page.
-   - Error: `Invalid email or password.`
-
-### 4) Route protection
-
-1. Log out (or use an incognito window).
-2. Try opening `http://localhost:3000/add`.
-3. Expected result:
-   - Redirect to `/login`.
-
-### 5) Adding a house (admin only)
-
-1. Login as admin.
-2. Open `http://localhost:3000/add`.
-3. Fill in the form:
-   - Title: `Sunny Villa`
-   - Location: `Miami, FL`
-   - Price: `550000`
-4. Submit.
-5. Expected result:
-   - Redirect to `/`.
-   - New house appears with status **Available**.
-
-### 6) Marking a house as sold (admin only)
-
-1. Login as admin.
-2. On home page (`/`), choose a house.
-3. Click **Mark as Sold**.
-4. Expected result:
-   - Page reloads.
-   - House status changes to **Sold**.
-
-### 7) Deleting a house (admin only)
-
-1. Login as admin.
-2. On home page (`/`), choose a house.
-3. Click **Delete**.
-4. Expected result:
-   - Page reloads.
-   - House is removed from the list.
-
-### 8) Logout
-
-1. While logged in, click **Logout**.
-2. Expected result:
-   - Redirect to `/login`.
-   - Protected pages are no longer available until login.
-
----
-
-## API Testing with Swagger UI
-
-The JSON API endpoints are unchanged and still public.
-
-1. Make sure server is running (`npm start`).
-2. Open `http://localhost:3000/api-docs`.
-3. Test API routes under the **API** tag.
-4. You can also view new web auth route docs under the **Web** tag:
-   - `GET /login`
-   - `POST /login`
-   - `POST /logout`
-
----
-
-## Quick cURL Checks for Login/Logout
-
-Use these commands in another terminal while server is running.
-
-### Login with valid credentials
+### Get properties
 
 ```bash
-curl -i -c cookie.txt -X POST http://localhost:3000/login \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "email=admin@example.com&password=admin123"
+curl -s http://localhost:3000/api/properties
 ```
 
-Expected: `302` redirect to `/` and session cookie saved.
-
-### Access protected route with session cookie
+### Create property
 
 ```bash
-curl -i -b cookie.txt http://localhost:3000/add
+curl -i -X POST http://localhost:3000/api/properties \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title":"Beachfront Villa",
+    "location":"Malibu, CA",
+    "price":2500000,
+    "type":"Villa",
+    "bedrooms":5,
+    "bathrooms":4,
+    "area":420,
+    "description":"Ocean view and private pool"
+  }'
 ```
 
-Expected: `200` with add-house HTML.
-
-### Logout
+### Patch property
 
 ```bash
-curl -i -b cookie.txt -X POST http://localhost:3000/logout
+curl -i -X PATCH http://localhost:3000/api/properties/1 \
+  -H "Content-Type: application/json" \
+  -d '{"price":2600000,"status":"Available"}'
 ```
 
-Expected: `302` redirect to `/login`.
-
-### Protected route without login
+### Mark as sold
 
 ```bash
-curl -i http://localhost:3000/add
+curl -i -X PATCH http://localhost:3000/api/properties/1/sold
 ```
 
-Expected: `302` redirect to `/login`.
+### Delete property
+
+```bash
+curl -i -X DELETE http://localhost:3000/api/properties/1
+```

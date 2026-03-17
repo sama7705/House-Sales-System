@@ -1,111 +1,47 @@
 # Run Guide
 
-This guide helps you run the House Sales System on your local machine.
+This guide helps you run the Real Estate System.
 
 ## Prerequisites
 
-Make sure you have:
+- Node.js (v18+ recommended)
+- npm
 
-- **Node.js** (v18+ recommended)
-- **npm** (comes with Node.js)
-
-Check your versions:
-
-```bash
-node -v
-npm -v
-```
-
-## Install Dependencies
-
-In the project folder, run:
+## Install
 
 ```bash
 npm install
 ```
 
-## Start the Server
-
-Run in normal mode:
+## Start
 
 ```bash
 npm start
 ```
 
-Run in development mode (auto-restart on file changes):
+Development mode:
 
 ```bash
 npm run dev
 ```
 
-## Default Port
+## URLs
 
-The server runs on:
+- App: `http://localhost:3000`
+- Swagger: `http://localhost:3000/api-docs`
+- Login: `http://localhost:3000/login`
 
-```text
-3000
-```
-
-So your base URL is:
-
-```text
-http://localhost:3000
-```
-
-## Login Information
-
-This project currently has one admin account (hardcoded):
+## Admin Account
 
 - Email: `admin@example.com`
 - Password: `admin123`
 
-Use this account on `http://localhost:3000/login`.
+## Main Pages
 
-## Access Browser Pages
+- Home (property list): `/`
+- Add property (login required): `/add-property`
+- Property details: `/properties/:id`
 
-Open these URLs in your browser:
+## Notes on Database Migration
 
-- Home/list page (public): `http://localhost:3000/`
-- Login page: `http://localhost:3000/login`
-- Add-house page (requires login): `http://localhost:3000/add`
-
-## Access Swagger Docs
-
-Open:
-
-- `http://localhost:3000/api-docs`
-
-From there, you can test API endpoints directly.
-
-## Common Issues and Quick Fixes
-
-### 1) `npm install` fails
-
-- Check internet connection.
-- Check Node.js version (`node -v`).
-- Try deleting `node_modules` and reinstall:
-
-```bash
-rm -rf node_modules package-lock.json
-npm install
-```
-
-### 2) `EADDRINUSE: address already in use :::3000`
-
-Another app is already using port 3000.
-
-Quick options:
-
-- Stop the other app using port 3000.
-- Or change the `PORT` value in `app.js`.
-
-### 3) Redirected to `/login` unexpectedly
-
-- This happens when you try an admin-only route without a session.
-- Log in first at `/login`, then try again.
-
-### 4) Database seems empty after restart
-
-- `houses.db` is a local SQLite file.
-- If you delete it, data is reset.
-- Make sure you are running from the correct project folder.
+On startup, the app ensures a `properties` table exists with the new schema. If an old `houses` table exists and `properties` is empty, old records are copied into `properties` with default values for new fields.

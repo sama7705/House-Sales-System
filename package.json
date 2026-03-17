@@ -1,7 +1,7 @@
 {
-  "name": "house-sales-system",
+  "name": "real-estate-system",
   "version": "1.0.0",
-  "description": "Simple house sales system built with Node.js, Express, SQLite, and EJS",
+  "description": "Simple real estate system built with Node.js, Express, SQLite, and EJS",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",

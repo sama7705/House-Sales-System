@@ -1,0 +1,42 @@
+<%- include('partials/header') %>
+
+<h2>Add New Property</h2>
+
+<% if (error) { %>
+  <p class="error"><%= error %></p>
+<% } %>
+
+<form action="/add-property" method="POST" class="form-card">
+  <label for="title">Title</label>
+  <input type="text" id="title" name="title" value="<%= formData.title || '' %>" required />
+
+  <label for="location">Location</label>
+  <input type="text" id="location" name="location" value="<%= formData.location || '' %>" required />
+
+  <label for="price">Price</label>
+  <input type="number" id="price" name="price" step="0.01" min="0" value="<%= formData.price || '' %>" required />
+
+  <label for="type">Type</label>
+  <select id="type" name="type" required>
+    <option value="">Select property type</option>
+    <% ['Apartment', 'Villa', 'House', 'Chalet', 'Office'].forEach((propertyType) => { %>
+      <option value="<%= propertyType %>" <%= formData.type === propertyType ? 'selected' : '' %>><%= propertyType %></option>
+    <% }) %>
+  </select>
+
+  <label for="bedrooms">Bedrooms</label>
+  <input type="number" id="bedrooms" name="bedrooms" min="0" value="<%= formData.bedrooms || '' %>" required />
+
+  <label for="bathrooms">Bathrooms</label>
+  <input type="number" id="bathrooms" name="bathrooms" min="0" value="<%= formData.bathrooms || '' %>" required />
+
+  <label for="area">Area (m²)</label>
+  <input type="number" id="area" name="area" step="0.01" min="0" value="<%= formData.area || '' %>" required />
+
+  <label for="description">Description</label>
+  <textarea id="description" name="description" rows="4"><%= formData.description || '' %></textarea>
+
+  <button type="submit">Add Property</button>
+</form>
+
+<%- include('partials/footer') %>

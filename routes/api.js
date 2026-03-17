@@ -2,121 +2,108 @@ const express = require('express');
 
 const router = express.Router();
 
-function getAllHouses(db, callback) {
-  db.all('SELECT * FROM houses ORDER BY id DESC', [], callback);
+function getAllProperties(db, callback) {
+  db.all('SELECT * FROM properties ORDER BY id DESC', [], callback);
 }
 
-function getHouseById(db, id, callback) {
-  db.get('SELECT * FROM houses WHERE id = ?', [id], callback);
+function getPropertyById(db, id, callback) {
+  db.get('SELECT * FROM properties WHERE id = ?', [id], callback);
 }
 
-function isInvalidPrice(price) {
-  return price === undefined || price === null || Number.isNaN(Number(price));
+function isInvalidNumber(value) {
+  return value === undefined || value === null || Number.isNaN(Number(value));
 }
 
-/**
- * @swagger
- * /api/houses:
- *   get:
- *     tags: [API]
- *     summary: List all houses (JSON)
- *     description: Returns all houses as JSON for API testing in Swagger.
- *     responses:
- *       200:
- *         $ref: '#/components/responses/HousesListResponse'
- *       500:
- *         description: Database error.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApiError'
- */
-router.get('/houses', (req, res) => {
-  const db = req.db;
-  getAllHouses(db, (err, houses) => {
+router.get('/properties', (req, res) => {
+  getAllProperties(req.db, (err, properties) => {
     if (err) {
       return res.status(500).json({ error: 'Database error' });
     }
-    res.json(houses);
+    return res.json(properties);
+  });
+});
+
+router.get('/properties/:id', (req, res) => {
+  getPropertyById(req.db, req.params.id, (err, property) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    if (!property) {
+      return res.status(404).json({ error: 'Property not found' });
+    }
+
+    return res.json(property);
   });
 });
 
 /**
  * @swagger
- * /api/houses/{id}:
+ * /api/properties:
  *   get:
  *     tags: [API]
- *     summary: Get one house by id (JSON)
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
+ *     summary: List all properties (JSON)
  *     responses:
  *       200:
- *         $ref: '#/components/responses/HouseResponse'
- *       404:
- *         $ref: '#/components/responses/HouseNotFoundError'
+ *         $ref: '#/components/responses/PropertiesListResponse'
  */
-router.get('/houses/:id', (req, res) => {
-  const db = req.db;
-  const { id } = req.params;
+router.post('/properties', (req, res) => {
+  const {
+    title,
+    location,
+    price,
+    type,
+    bedrooms,
+    bathrooms,
+    area,
+    description
+  } = req.body;
 
-  getHouseById(db, id, (err, house) => {
-    if (err) {
-      return res.status(500).json({ error: 'Database error' });
-    }
-
-    if (!house) {
-      return res.status(404).json({ error: 'House not found' });
-    }
-
-    return res.json(house);
-  });
-});
-
-/**
- * @swagger
- * /api/houses:
- *   post:
- *     tags: [API]
- *     summary: Create a house (JSON)
- *     description: Creates a new house from JSON data.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/HouseInput'
- *     responses:
- *       201:
- *         $ref: '#/components/responses/HouseCreatedResponse'
- *       400:
- *         $ref: '#/components/responses/MissingFieldsError'
- */
-router.post('/houses', (req, res) => {
-  const db = req.db;
-  const { title, location, price } = req.body;
-
-  if (!title || !location || isInvalidPrice(price)) {
-    return res.status(400).json({ error: 'Title, location, and valid price are required.' });
+  if (
+    !title
+    || !location
+    || !type
+    || isInvalidNumber(price)
+    || isInvalidNumber(bedrooms)
+    || isInvalidNumber(bathrooms)
+    || isInvalidNumber(area)
+  ) {
+    return res.status(400).json({
+      error: 'Title, location, type, price, bedrooms, bathrooms, and area are required.'
+    });
   }
 
-  db.run(
-    'INSERT INTO houses (title, location, price, status) VALUES (?, ?, ?, ?)',
-    [title.trim(), location.trim(), Number(price), 'Available'],
+  return req.db.run(
+    `INSERT INTO properties
+      (title, location, price, type, bedrooms, bathrooms, area, status, description)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      title.trim(),
+      location.trim(),
+      Number(price),
+      type,
+      Number(bedrooms),
+      Number(bathrooms),
+      Number(area),
+      'Available',
+      description ? description.trim() : null
+    ],
     function onInsert(err) {
       if (err) {
         return res.status(500).json({ error: 'Database error' });
       }
 
-      res.status(201).json({
+      return res.status(201).json({
         id: this.lastID,
         title: title.trim(),
         location: location.trim(),
         price: Number(price),
-        status: 'Available'
+        type,
+        bedrooms: Number(bedrooms),
+        bathrooms: Number(bathrooms),
+        area: Number(area),
+        status: 'Available',
+        description: description ? description.trim() : null
       });
     }
   );
@@ -124,77 +111,105 @@ router.post('/houses', (req, res) => {
 
 /**
  * @swagger
- * /api/houses/{id}:
- *   patch:
+ * /api/properties/{id}:
+ *   get:
  *     tags: [API]
- *     summary: Update one house partially (JSON)
- *     description: Update title, location, price, and/or status for a house.
+ *     summary: Get one property by id (JSON)
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: integer
+ *     responses:
+ *       200:
+ *         $ref: '#/components/responses/PropertyResponse'
+ *       404:
+ *         $ref: '#/components/responses/PropertyNotFoundError'
+ *   patch:
+ *     tags: [API]
+ *     summary: Update one property partially (JSON)
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/HousePatchInput'
- *     responses:
- *       200:
- *         $ref: '#/components/responses/HouseResponse'
- *       400:
- *         $ref: '#/components/responses/MissingFieldsError'
- *       404:
- *         $ref: '#/components/responses/HouseNotFoundError'
+ *             $ref: '#/components/schemas/PropertyPatchInput'
  */
-router.patch('/houses/:id', (req, res) => {
-  const db = req.db;
+router.patch('/properties/:id', (req, res) => {
   const { id } = req.params;
-  const { title, location, price, status } = req.body;
+  const {
+    title,
+    location,
+    price,
+    type,
+    bedrooms,
+    bathrooms,
+    area,
+    status,
+    description
+  } = req.body;
 
-  if ([title, location, price, status].every((field) => field === undefined)) {
+  if ([title, location, price, type, bedrooms, bathrooms, area, status, description].every((value) => value === undefined)) {
     return res.status(400).json({ error: 'Provide at least one field to update.' });
   }
 
-  if (price !== undefined && isInvalidPrice(price)) {
-    return res.status(400).json({ error: 'Price must be a valid number.' });
+  if (
+    (price !== undefined && isInvalidNumber(price))
+    || (bedrooms !== undefined && isInvalidNumber(bedrooms))
+    || (bathrooms !== undefined && isInvalidNumber(bathrooms))
+    || (area !== undefined && isInvalidNumber(area))
+  ) {
+    return res.status(400).json({ error: 'Price, bedrooms, bathrooms, and area must be valid numbers.' });
   }
 
   if (status !== undefined && !['Available', 'Sold'].includes(status)) {
     return res.status(400).json({ error: 'Status must be Available or Sold.' });
   }
 
-  getHouseById(db, id, (readErr, existingHouse) => {
+  getPropertyById(req.db, id, (readErr, existingProperty) => {
     if (readErr) {
       return res.status(500).json({ error: 'Database error' });
     }
 
-    if (!existingHouse) {
-      return res.status(404).json({ error: 'House not found' });
+    if (!existingProperty) {
+      return res.status(404).json({ error: 'Property not found' });
     }
 
-    const nextTitle = title !== undefined ? title.trim() : existingHouse.title;
-    const nextLocation = location !== undefined ? location.trim() : existingHouse.location;
-    const nextPrice = price !== undefined ? Number(price) : existingHouse.price;
-    const nextStatus = status !== undefined ? status : existingHouse.status;
+    const updated = {
+      title: title !== undefined ? title.trim() : existingProperty.title,
+      location: location !== undefined ? location.trim() : existingProperty.location,
+      price: price !== undefined ? Number(price) : existingProperty.price,
+      type: type !== undefined ? type : existingProperty.type,
+      bedrooms: bedrooms !== undefined ? Number(bedrooms) : existingProperty.bedrooms,
+      bathrooms: bathrooms !== undefined ? Number(bathrooms) : existingProperty.bathrooms,
+      area: area !== undefined ? Number(area) : existingProperty.area,
+      status: status !== undefined ? status : existingProperty.status,
+      description: description !== undefined ? description : existingProperty.description
+    };
 
-    db.run(
-      'UPDATE houses SET title = ?, location = ?, price = ?, status = ? WHERE id = ?',
-      [nextTitle, nextLocation, nextPrice, nextStatus, id],
+    return req.db.run(
+      `UPDATE properties
+       SET title = ?, location = ?, price = ?, type = ?, bedrooms = ?, bathrooms = ?, area = ?, status = ?, description = ?
+       WHERE id = ?`,
+      [
+        updated.title,
+        updated.location,
+        updated.price,
+        updated.type,
+        updated.bedrooms,
+        updated.bathrooms,
+        updated.area,
+        updated.status,
+        updated.description,
+        id
+      ],
       (err) => {
         if (err) {
           return res.status(500).json({ error: 'Database error' });
         }
 
-        return res.json({
-          id: Number(id),
-          title: nextTitle,
-          location: nextLocation,
-          price: nextPrice,
-          status: nextStatus
-        });
+        return res.json({ id: Number(id), ...updated });
       }
     );
   });
@@ -202,79 +217,43 @@ router.patch('/houses/:id', (req, res) => {
 
 /**
  * @swagger
- * /api/houses/{id}/sold:
+ * /api/properties/{id}/sold:
  *   patch:
  *     tags: [API]
- *     summary: Mark a house as sold (JSON)
- *     description: Updates the selected house status to Sold.
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         example: 1
- *     responses:
- *       200:
- *         $ref: '#/components/responses/MessageResponse'
- *       404:
- *         $ref: '#/components/responses/HouseNotFoundError'
- *       500:
- *         description: Database error.
+ *     summary: Mark a property as sold (JSON)
  */
-router.patch('/houses/:id/sold', (req, res) => {
-  const db = req.db;
-  const { id } = req.params;
-
-  db.run('UPDATE houses SET status = ? WHERE id = ?', ['Sold', id], function onUpdate(err) {
+router.patch('/properties/:id/sold', (req, res) => {
+  req.db.run('UPDATE properties SET status = ? WHERE id = ?', ['Sold', req.params.id], function onUpdate(err) {
     if (err) {
       return res.status(500).json({ error: 'Database error' });
     }
 
     if (this.changes === 0) {
-      return res.status(404).json({ error: 'House not found' });
+      return res.status(404).json({ error: 'Property not found' });
     }
 
-    res.json({ message: 'House marked as sold' });
+    return res.json({ message: 'Property marked as sold' });
   });
 });
 
 /**
  * @swagger
- * /api/houses/{id}:
+ * /api/properties/{id}:
  *   delete:
  *     tags: [API]
- *     summary: Delete a house (JSON)
- *     description: Deletes the selected house.
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         example: 1
- *     responses:
- *       200:
- *         $ref: '#/components/responses/MessageResponse'
- *       404:
- *         $ref: '#/components/responses/HouseNotFoundError'
- *       500:
- *         description: Database error.
+ *     summary: Delete a property (JSON)
  */
-router.delete('/houses/:id', (req, res) => {
-  const db = req.db;
-  const { id } = req.params;
-
-  db.run('DELETE FROM houses WHERE id = ?', [id], function onDelete(err) {
+router.delete('/properties/:id', (req, res) => {
+  req.db.run('DELETE FROM properties WHERE id = ?', [req.params.id], function onDelete(err) {
     if (err) {
       return res.status(500).json({ error: 'Database error' });
     }
 
     if (this.changes === 0) {
-      return res.status(404).json({ error: 'House not found' });
+      return res.status(404).json({ error: 'Property not found' });
     }
 
-    res.json({ message: 'House deleted successfully' });
+    return res.json({ message: 'Property deleted successfully' });
   });
 });
 
