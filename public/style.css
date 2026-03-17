@@ -45,6 +45,40 @@ body {
   border-radius: 8px;
 }
 
+
+.filters-form {
+  border: 1px solid #e3e3e3;
+  border-radius: 6px;
+  padding: 12px;
+  margin: 14px 0 18px;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.filters-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.filters-actions {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.clear-filters {
+  color: #1f4e79;
+  text-decoration: none;
+  font-size: 14px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;

@@ -6,6 +6,68 @@
   <p class="info">You are viewing as a guest. Login to add, sell, or delete properties.</p>
 <% } %>
 
+<form action="/" method="GET" class="filters-form">
+  <div class="filters-grid">
+    <label>
+      Search (title or location)
+      <input
+        type="text"
+        name="search"
+        placeholder="e.g. Cairo"
+        value="<%= filters && filters.search ? filters.search : '' %>"
+      >
+    </label>
+
+    <label>
+      Property type
+      <select name="type">
+        <option value="">All types</option>
+        <option value="Apartment" <%= filters && filters.type === 'Apartment' ? 'selected' : '' %>>Apartment</option>
+        <option value="Villa" <%= filters && filters.type === 'Villa' ? 'selected' : '' %>>Villa</option>
+        <option value="House" <%= filters && filters.type === 'House' ? 'selected' : '' %>>House</option>
+        <option value="Chalet" <%= filters && filters.type === 'Chalet' ? 'selected' : '' %>>Chalet</option>
+        <option value="Office" <%= filters && filters.type === 'Office' ? 'selected' : '' %>>Office</option>
+      </select>
+    </label>
+
+    <label>
+      Status
+      <select name="status">
+        <option value="">All statuses</option>
+        <option value="Available" <%= filters && filters.status === 'Available' ? 'selected' : '' %>>Available</option>
+        <option value="Sold" <%= filters && filters.status === 'Sold' ? 'selected' : '' %>>Sold</option>
+      </select>
+    </label>
+
+    <label>
+      Min price
+      <input
+        type="number"
+        min="0"
+        step="1"
+        name="minPrice"
+        value="<%= filters && filters.minPrice ? filters.minPrice : '' %>"
+      >
+    </label>
+
+    <label>
+      Max price
+      <input
+        type="number"
+        min="0"
+        step="1"
+        name="maxPrice"
+        value="<%= filters && filters.maxPrice ? filters.maxPrice : '' %>"
+      >
+    </label>
+  </div>
+
+  <div class="filters-actions">
+    <button type="submit">Apply Filters</button>
+    <a href="/" class="clear-filters">Clear</a>
+  </div>
+</form>
+
 <% if (properties.length === 0) { %>
   <p>No properties found.</p>
 <% } else { %>
