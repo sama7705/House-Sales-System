@@ -74,6 +74,7 @@
   <table>
     <thead>
       <tr>
+        <th>Image</th>
         <th>Title</th>
         <th>Location</th>
         <th>Type</th>
@@ -87,6 +88,13 @@
     <tbody>
       <% properties.forEach((property) => { %>
         <tr>
+          <td>
+            <% if (property.image_url) { %>
+              <img src="<%= property.image_url %>" alt="<%= property.title %>" class="property-thumb" />
+            <% } else { %>
+              <div class="image-placeholder">No Image</div>
+            <% } %>
+          </td>
           <td><a href="/properties/<%= property.id %>"><%= property.title %></a></td>
           <td><%= property.location %></td>
           <td><%= property.type %></td>

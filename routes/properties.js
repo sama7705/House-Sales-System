@@ -140,6 +140,10 @@ function requireLogin(req, res, next) {
  *         description:
  *           type: string
  *           example: Bright apartment near city center.
+ *         image_url:
+ *           type: string
+ *           nullable: true
+ *           example: https://images.example.com/property-1.jpg
  *       required:
  *         - id
  *         - title
@@ -178,6 +182,9 @@ function requireLogin(req, res, next) {
  *           type: number
  *         description:
  *           type: string
+ *         image_url:
+ *           type: string
+ *           nullable: true
  *     PropertyPatchInput:
  *       type: object
  *       properties:
@@ -201,6 +208,9 @@ function requireLogin(req, res, next) {
  *           enum: [Available, Sold]
  *         description:
  *           type: string
+ *         image_url:
+ *           type: string
+ *           nullable: true
  *     ApiMessage:
  *       type: object
  *       properties:
@@ -348,7 +358,8 @@ router.post('/add-property', requireLogin, (req, res) => {
     bedrooms,
     bathrooms,
     area,
-    description
+    description,
+    image_url
   } = req.body;
 
   if (hasInvalidRequiredFields(req.body)) {
@@ -360,8 +371,8 @@ router.post('/add-property', requireLogin, (req, res) => {
 
   return req.db.run(
     `INSERT INTO properties
-      (title, location, price, type, bedrooms, bathrooms, area, status, description)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (title, location, price, type, bedrooms, bathrooms, area, status, description, image_url)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       title.trim(),
       location.trim(),
@@ -371,7 +382,8 @@ router.post('/add-property', requireLogin, (req, res) => {
       Number(bathrooms),
       Number(area),
       'Available',
-      description ? description.trim() : null
+      description ? description.trim() : null,
+      image_url ? image_url.trim() : null
     ],
     (err) => {
       if (err) {
