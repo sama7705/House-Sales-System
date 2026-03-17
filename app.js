@@ -81,10 +81,112 @@ function migrateHousesIntoProperties(database) {
   });
 }
 
+function seedSampleProperties(database) {
+  const sampleProperties = [
+    {
+      title: 'Modern Villa in Cairo',
+      location: 'Cairo',
+      price: 4500000,
+      type: 'Villa',
+      bedrooms: 5,
+      bathrooms: 4,
+      area: 420,
+      description: 'A modern villa with a private garden in a quiet neighborhood.',
+      status: 'Available'
+    },
+    {
+      title: 'Family Apartment in Giza',
+      location: 'Giza',
+      price: 1850000,
+      type: 'Apartment',
+      bedrooms: 3,
+      bathrooms: 2,
+      area: 180,
+      description: 'Comfortable family apartment close to schools and services.',
+      status: 'Available'
+    },
+    {
+      title: 'Sea View Chalet in Alexandria',
+      location: 'Alexandria',
+      price: 2600000,
+      type: 'Chalet',
+      bedrooms: 3,
+      bathrooms: 2,
+      area: 210,
+      description: 'Chalet with a sea view and easy access to the beach.',
+      status: 'Available'
+    },
+    {
+      title: 'Office Space in New Cairo',
+      location: 'New Cairo',
+      price: 3200000,
+      type: 'Office',
+      bedrooms: 0,
+      bathrooms: 2,
+      area: 260,
+      description: 'Ready-to-use office space in a business-focused district.',
+      status: 'Available'
+    },
+    {
+      title: 'Luxury Penthouse in Zamalek',
+      location: 'Zamalek',
+      price: 7800000,
+      type: 'Penthouse',
+      bedrooms: 4,
+      bathrooms: 3,
+      area: 350,
+      description: 'Spacious penthouse with panoramic city views.',
+      status: 'Available'
+    }
+  ];
+
+  database.get('SELECT COUNT(*) AS count FROM properties', [], (countErr, countRow) => {
+    if (countErr) {
+      console.error('Could not count properties for seeding.', countErr.message);
+      return;
+    }
+
+    if (countRow.count > 0) {
+      return;
+    }
+
+    const insertSql = `
+      INSERT INTO properties (title, location, price, type, bedrooms, bathrooms, area, description, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const statement = database.prepare(insertSql);
+
+    sampleProperties.forEach((property) => {
+      statement.run([
+        property.title,
+        property.location,
+        property.price,
+        property.type,
+        property.bedrooms,
+        property.bathrooms,
+        property.area,
+        property.description,
+        property.status
+      ]);
+    });
+
+    statement.finalize((finalizeErr) => {
+      if (finalizeErr) {
+        console.error('Could not seed sample properties.', finalizeErr.message);
+        return;
+      }
+
+      console.log('Sample properties were added to an empty properties table.');
+    });
+  });
+}
+
 db.serialize(() => {
   ensurePropertiesTable(db);
   addMissingPropertyColumns(db);
   migrateHousesIntoProperties(db);
+  seedSampleProperties(db);
 });
 
 const swaggerOptions = {
