@@ -4,8 +4,7 @@
   "description": "Simple house sales system built with Node.js, Express, SQLite, and EJS",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "start": "node app.js"
   },
   "dependencies": {
     "ejs": "^3.1.10",
