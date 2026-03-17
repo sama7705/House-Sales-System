@@ -2,12 +2,24 @@ const express = require('express');
 
 const router = express.Router();
 
+const ADMIN_USER = {
+  email: 'admin@example.com',
+  password: 'admin123'
+};
+
 function getAllHouses(db, callback) {
   db.all('SELECT * FROM houses ORDER BY id DESC', [], callback);
 }
 
 function isInvalidPrice(price) {
   return price === undefined || price === null || Number.isNaN(Number(price));
+}
+
+function requireLogin(req, res, next) {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  return next();
 }
 
 /**
@@ -173,7 +185,86 @@ router.get('/', (req, res) => {
     if (err) {
       return res.status(500).send('Database error');
     }
-    res.render('index', { houses });
+    return res.render('index', { houses });
+  });
+});
+
+/**
+ * @swagger
+ * /login:
+ *   get:
+ *     tags: [Web]
+ *     summary: Show login page
+ *     description: Opens a simple login form for admin access.
+ *     responses:
+ *       200:
+ *         description: Login page loaded.
+ */
+router.get('/login', (req, res) => {
+  if (req.session.user) {
+    return res.redirect('/');
+  }
+
+  return res.render('login', { error: null, formData: {} });
+});
+
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     tags: [Web]
+ *     summary: Login with hardcoded admin account
+ *     description: Validates email and password, then stores session on success.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: admin@example.com
+ *               password:
+ *                 type: string
+ *                 example: admin123
+ *     responses:
+ *       302:
+ *         description: Redirects to home after successful login.
+ *       401:
+ *         description: Invalid credentials.
+ */
+router.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  if (email === ADMIN_USER.email && password === ADMIN_USER.password) {
+    req.session.user = { email: ADMIN_USER.email };
+    return res.redirect('/');
+  }
+
+  return res.status(401).render('login', {
+    error: 'Invalid email or password.',
+    formData: { email }
+  });
+});
+
+/**
+ * @swagger
+ * /logout:
+ *   post:
+ *     tags: [Web]
+ *     summary: Logout current user
+ *     description: Destroys session and redirects to login page.
+ *     responses:
+ *       302:
+ *         description: Redirects to login page.
+ */
+router.post('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/login');
   });
 });
 
@@ -188,7 +279,7 @@ router.get('/', (req, res) => {
  *       200:
  *         description: Add house form page loaded.
  */
-router.get('/add', (req, res) => {
+router.get('/add', requireLogin, (req, res) => {
   res.render('add-house', { error: null, formData: {} });
 });
 
@@ -213,7 +304,7 @@ router.get('/add', (req, res) => {
  *       500:
  *         description: Database error.
  */
-router.post('/add', (req, res) => {
+router.post('/add', requireLogin, (req, res) => {
   const db = req.db;
   const { title, location, price } = req.body;
 
@@ -224,14 +315,14 @@ router.post('/add', (req, res) => {
     });
   }
 
-  db.run(
+  return db.run(
     'INSERT INTO houses (title, location, price, status) VALUES (?, ?, ?, ?)',
     [title.trim(), location.trim(), Number(price), 'Available'],
     (err) => {
       if (err) {
         return res.status(500).send('Database error');
       }
-      res.redirect('/');
+      return res.redirect('/');
     }
   );
 });
@@ -256,7 +347,7 @@ router.post('/add', (req, res) => {
  *       500:
  *         description: Database error.
  */
-router.post('/sold/:id', (req, res) => {
+router.post('/sold/:id', requireLogin, (req, res) => {
   const db = req.db;
   const { id } = req.params;
 
@@ -264,7 +355,7 @@ router.post('/sold/:id', (req, res) => {
     if (err) {
       return res.status(500).send('Database error');
     }
-    res.redirect('/');
+    return res.redirect('/');
   });
 });
 
@@ -288,7 +379,7 @@ router.post('/sold/:id', (req, res) => {
  *       500:
  *         description: Database error.
  */
-router.post('/delete/:id', (req, res) => {
+router.post('/delete/:id', requireLogin, (req, res) => {
   const db = req.db;
   const { id } = req.params;
 
@@ -296,7 +387,7 @@ router.post('/delete/:id', (req, res) => {
     if (err) {
       return res.status(500).send('Database error');
     }
-    res.redirect('/');
+    return res.redirect('/');
   });
 });
 
