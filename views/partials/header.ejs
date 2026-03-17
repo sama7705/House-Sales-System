@@ -9,9 +9,17 @@
 <body>
   <header class="header">
     <h1>House Sales System</h1>
-    <nav>
+    <nav class="top-nav">
       <a href="/">Home</a>
-      <a href="/add">Add House</a>
+
+      <% if (isLoggedIn) { %>
+        <a href="/add">Add House</a>
+        <form action="/logout" method="POST" class="inline-form">
+          <button type="submit" class="nav-button">Logout</button>
+        </form>
+      <% } else { %>
+        <a href="/login">Login</a>
+      <% } %>
     </nav>
   </header>
   <main class="container">

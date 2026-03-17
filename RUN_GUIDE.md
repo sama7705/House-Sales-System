@@ -52,12 +52,22 @@ So your base URL is:
 http://localhost:3000
 ```
 
+## Login Information
+
+This project currently has one admin account (hardcoded):
+
+- Email: `admin@example.com`
+- Password: `admin123`
+
+Use this account on `http://localhost:3000/login`.
+
 ## Access Browser Pages
 
 Open these URLs in your browser:
 
-- Home/list page: `http://localhost:3000/`
-- Add-house page: `http://localhost:3000/add`
+- Home/list page (public): `http://localhost:3000/`
+- Login page: `http://localhost:3000/login`
+- Add-house page (requires login): `http://localhost:3000/add`
 
 ## Access Swagger Docs
 
@@ -89,11 +99,10 @@ Quick options:
 - Stop the other app using port 3000.
 - Or change the `PORT` value in `app.js`.
 
-### 3) `Cannot GET /` or blank page
+### 3) Redirected to `/login` unexpectedly
 
-- Make sure the server is running and shows no startup error.
-- Open exactly `http://localhost:3000/`.
-- Check terminal logs for database or template errors.
+- This happens when you try an admin-only route without a session.
+- Log in first at `/login`, then try again.
 
 ### 4) Database seems empty after restart
 

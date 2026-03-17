@@ -4,14 +4,16 @@
   "description": "Simple house sales system built with Node.js, Express, SQLite, and EJS",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "dependencies": {
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "sqlite3": "^5.1.7",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "express-session": "^1.18.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

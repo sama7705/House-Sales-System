@@ -2,8 +2,12 @@
 
 <h2>All Houses</h2>
 
+<% if (!isLoggedIn) { %>
+  <p class="info">You are viewing as a guest. Login to add, sell, or delete houses.</p>
+<% } %>
+
 <% if (houses.length === 0) { %>
-  <p>No houses found. Click "Add House" to add one.</p>
+  <p>No houses found.</p>
 <% } else { %>
   <table>
     <thead>
@@ -27,15 +31,19 @@
             <span class="status <%= house.status.toLowerCase() %>"><%= house.status %></span>
           </td>
           <td class="actions">
-            <% if (house.status === 'Available') { %>
-              <form action="/sold/<%= house.id %>" method="POST">
-                <button type="submit">Mark as Sold</button>
-              </form>
-            <% } %>
+            <% if (isLoggedIn) { %>
+              <% if (house.status === 'Available') { %>
+                <form action="/sold/<%= house.id %>" method="POST">
+                  <button type="submit">Mark as Sold</button>
+                </form>
+              <% } %>
 
-            <form action="/delete/<%= house.id %>" method="POST">
-              <button type="submit" class="delete">Delete</button>
-            </form>
+              <form action="/delete/<%= house.id %>" method="POST">
+                <button type="submit" class="delete">Delete</button>
+              </form>
+            <% } else { %>
+              <span class="muted">Login required</span>
+            <% } %>
           </td>
         </tr>
       <% }) %>
