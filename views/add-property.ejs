@@ -33,6 +33,16 @@
   <label for="area">Area (m²)</label>
   <input type="number" id="area" name="area" step="0.01" min="0" value="<%= formData.area || '' %>" required />
 
+
+  <label for="image_url">Image URL</label>
+  <input
+    type="url"
+    id="image_url"
+    name="image_url"
+    placeholder="https://example.com/house.jpg"
+    value="<%= formData.image_url || '' %>"
+  />
+
   <label for="description">Description</label>
   <textarea id="description" name="description" rows="4"><%= formData.description || '' %></textarea>
 

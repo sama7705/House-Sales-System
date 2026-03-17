@@ -101,7 +101,8 @@ router.post('/properties', (req, res) => {
     bedrooms,
     bathrooms,
     area,
-    description
+    description,
+    image_url
   } = req.body;
 
   if (
@@ -120,8 +121,8 @@ router.post('/properties', (req, res) => {
 
   return req.db.run(
     `INSERT INTO properties
-      (title, location, price, type, bedrooms, bathrooms, area, status, description)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (title, location, price, type, bedrooms, bathrooms, area, status, description, image_url)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       title.trim(),
       location.trim(),
@@ -131,7 +132,8 @@ router.post('/properties', (req, res) => {
       Number(bathrooms),
       Number(area),
       'Available',
-      description ? description.trim() : null
+      description ? description.trim() : null,
+      image_url ? image_url.trim() : null
     ],
     function onInsert(err) {
       if (err) {
@@ -148,7 +150,8 @@ router.post('/properties', (req, res) => {
         bathrooms: Number(bathrooms),
         area: Number(area),
         status: 'Available',
-        description: description ? description.trim() : null
+        description: description ? description.trim() : null,
+        image_url: image_url ? image_url.trim() : null
       });
     }
   );
@@ -192,10 +195,11 @@ router.patch('/properties/:id', (req, res) => {
     bathrooms,
     area,
     status,
-    description
+    description,
+    image_url
   } = req.body;
 
-  if ([title, location, price, type, bedrooms, bathrooms, area, status, description].every((value) => value === undefined)) {
+  if ([title, location, price, type, bedrooms, bathrooms, area, status, description, image_url].every((value) => value === undefined)) {
     return res.status(400).json({ error: 'Provide at least one field to update.' });
   }
 
@@ -230,12 +234,13 @@ router.patch('/properties/:id', (req, res) => {
       bathrooms: bathrooms !== undefined ? Number(bathrooms) : existingProperty.bathrooms,
       area: area !== undefined ? Number(area) : existingProperty.area,
       status: status !== undefined ? status : existingProperty.status,
-      description: description !== undefined ? description : existingProperty.description
+      description: description !== undefined ? (description ? description.trim() : null) : existingProperty.description,
+      image_url: image_url !== undefined ? (image_url ? image_url.trim() : null) : existingProperty.image_url
     };
 
     return req.db.run(
       `UPDATE properties
-       SET title = ?, location = ?, price = ?, type = ?, bedrooms = ?, bathrooms = ?, area = ?, status = ?, description = ?
+       SET title = ?, location = ?, price = ?, type = ?, bedrooms = ?, bathrooms = ?, area = ?, status = ?, description = ?, image_url = ?
        WHERE id = ?`,
       [
         updated.title,
@@ -247,6 +252,7 @@ router.patch('/properties/:id', (req, res) => {
         updated.area,
         updated.status,
         updated.description,
+        updated.image_url,
         id
       ],
       (err) => {

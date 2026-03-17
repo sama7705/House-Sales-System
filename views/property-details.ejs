@@ -1,6 +1,12 @@
 <%- include('partials/header') %>
 
 <div class="details-card">
+  <% if (property.image_url) { %>
+    <img src="<%= property.image_url %>" alt="<%= property.title %>" class="property-hero" />
+  <% } else { %>
+    <div class="image-placeholder property-hero-placeholder">No image provided</div>
+  <% } %>
+
   <h2><%= property.title %></h2>
   <p><strong>Location:</strong> <%= property.location %></p>
   <p><strong>Type:</strong> <%= property.type %></p>
