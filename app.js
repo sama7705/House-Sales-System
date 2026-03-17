@@ -27,7 +27,7 @@ function ensurePropertiesTable(database) {
       area REAL NOT NULL DEFAULT 0,
       status TEXT NOT NULL DEFAULT 'Available',
       description TEXT,
-      image_url TEXT
+      image_url TEXT DEFAULT NULL
     )
   `);
 }
@@ -39,7 +39,7 @@ function addMissingPropertyColumns(database) {
     { name: 'bathrooms', sql: 'ALTER TABLE properties ADD COLUMN bathrooms INTEGER NOT NULL DEFAULT 0' },
     { name: 'area', sql: 'ALTER TABLE properties ADD COLUMN area REAL NOT NULL DEFAULT 0' },
     { name: 'description', sql: 'ALTER TABLE properties ADD COLUMN description TEXT' },
-    { name: 'image_url', sql: 'ALTER TABLE properties ADD COLUMN image_url TEXT' }
+    { name: 'image_url', sql: 'ALTER TABLE properties ADD COLUMN image_url TEXT DEFAULT NULL' }
   ];
 
   database.all('PRAGMA table_info(properties)', [], (err, columns) => {

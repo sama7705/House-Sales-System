@@ -74,11 +74,12 @@
   <section class="property-grid">
     <% properties.forEach((property) => { %>
       <article class="property-card">
-        <% if (property.image_url) { %>
-          <img src="<%= property.image_url %>" alt="<%= property.title %>" class="property-thumb" />
-        <% } else { %>
-          <div class="image-placeholder card-placeholder">No Image</div>
-        <% } %>
+        <img
+          src="<%= property.image_url || '/images/property-placeholder.svg' %>"
+          alt="<%= property.title %>"
+          class="property-thumb"
+          onerror="this.onerror=null;this.src='/images/property-placeholder.svg';"
+        />
 
         <div class="property-content">
           <div class="card-header-row">

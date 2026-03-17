@@ -108,6 +108,7 @@ body {
   width: 100%;
   height: 180px;
   object-fit: cover;
+  background: #eef2f7;
 }
 
 .card-placeholder {
@@ -213,6 +214,13 @@ textarea {
   resize: vertical;
 }
 
+
+.field-hint {
+  margin: -4px 0 0;
+  font-size: 12px;
+  color: #666;
+  grid-column: 2;
+}
 .form-card button {
   margin-left: 192px;
 }
@@ -223,17 +231,18 @@ textarea {
   gap: 20px;
 }
 
+.details-media {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 .property-hero {
   width: 100%;
   height: 100%;
   max-height: 340px;
   object-fit: cover;
   border-radius: 8px;
-}
-
-.property-hero-placeholder {
-  width: 100%;
-  min-height: 260px;
+  background: #eef2f7;
 }
 
 .details-grid {
@@ -289,16 +298,6 @@ textarea {
   color: #777;
 }
 
-.image-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f2f2f2;
-  color: #666;
-  border: 1px dashed #ccc;
-  border-radius: 4px;
-  font-size: 13px;
-}
 
 .empty-state {
   text-align: center;
@@ -316,6 +315,10 @@ textarea {
 
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .field-hint {
+    grid-column: auto;
   }
 
   .form-card button {

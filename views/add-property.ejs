@@ -42,6 +42,7 @@
       placeholder="https://example.com/house.jpg"
       value="<%= formData.image_url || '' %>"
     />
+    <p class="field-hint">Optional. If left empty, we will show a default placeholder image.</p>
 
     <label for="description">Description</label>
     <textarea id="description" name="description" rows="4"><%= formData.description || '' %></textarea>

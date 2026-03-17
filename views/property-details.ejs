@@ -2,11 +2,12 @@
 
 <section class="details-card">
   <div class="details-media">
-    <% if (property.image_url) { %>
-      <img src="<%= property.image_url %>" alt="<%= property.title %>" class="property-hero" />
-    <% } else { %>
-      <div class="image-placeholder property-hero-placeholder">No image provided</div>
-    <% } %>
+    <img
+      src="<%= property.image_url || '/images/property-placeholder.svg' %>"
+      alt="<%= property.title %>"
+      class="property-hero"
+      onerror="this.onerror=null;this.src='/images/property-placeholder.svg';"
+    />
   </div>
 
   <div class="details-content">
