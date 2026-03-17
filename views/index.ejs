@@ -28,12 +28,12 @@
           </td>
           <td class="actions">
             <% if (house.status === 'Available') { %>
-              <form action="/houses/<%= house.id %>/sold" method="POST">
+              <form action="/sold/<%= house.id %>" method="POST">
                 <button type="submit">Mark as Sold</button>
               </form>
             <% } %>
 
-            <form action="/houses/<%= house.id %>/delete" method="POST">
+            <form action="/delete/<%= house.id %>" method="POST">
               <button type="submit" class="delete">Delete</button>
             </form>
           </td>
