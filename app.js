@@ -5,7 +5,7 @@ const sqlite3 = require('sqlite3').verbose();
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 
-const houseRoutes = require('./routes/houses');
+const propertyRoutes = require('./routes/properties');
 const apiRoutes = require('./routes/api');
 
 const app = express();
@@ -14,25 +14,84 @@ const PORT = 3000;
 const dbPath = path.join(__dirname, 'houses.db');
 const db = new sqlite3.Database(dbPath);
 
-db.serialize(() => {
-  db.run(`
-    CREATE TABLE IF NOT EXISTS houses (
+function ensurePropertiesTable(database) {
+  database.run(`
+    CREATE TABLE IF NOT EXISTS properties (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
       location TEXT NOT NULL,
       price REAL NOT NULL,
-      status TEXT NOT NULL DEFAULT 'Available'
+      type TEXT NOT NULL DEFAULT 'House',
+      bedrooms INTEGER NOT NULL DEFAULT 0,
+      bathrooms INTEGER NOT NULL DEFAULT 0,
+      area REAL NOT NULL DEFAULT 0,
+      status TEXT NOT NULL DEFAULT 'Available',
+      description TEXT
     )
   `);
+}
+
+function addMissingPropertyColumns(database) {
+  const requiredColumns = [
+    { name: 'type', sql: "ALTER TABLE properties ADD COLUMN type TEXT NOT NULL DEFAULT 'House'" },
+    { name: 'bedrooms', sql: 'ALTER TABLE properties ADD COLUMN bedrooms INTEGER NOT NULL DEFAULT 0' },
+    { name: 'bathrooms', sql: 'ALTER TABLE properties ADD COLUMN bathrooms INTEGER NOT NULL DEFAULT 0' },
+    { name: 'area', sql: 'ALTER TABLE properties ADD COLUMN area REAL NOT NULL DEFAULT 0' },
+    { name: 'description', sql: 'ALTER TABLE properties ADD COLUMN description TEXT' }
+  ];
+
+  database.all('PRAGMA table_info(properties)', [], (err, columns) => {
+    if (err) {
+      console.error('Could not inspect properties table.', err.message);
+      return;
+    }
+
+    const existing = new Set(columns.map((column) => column.name));
+
+    requiredColumns.forEach((column) => {
+      if (!existing.has(column.name)) {
+        database.run(column.sql, (alterErr) => {
+          if (alterErr) {
+            console.error(`Could not add column ${column.name}.`, alterErr.message);
+          }
+        });
+      }
+    });
+  });
+}
+
+function migrateHousesIntoProperties(database) {
+  database.get("SELECT name FROM sqlite_master WHERE type='table' AND name='houses'", [], (tableErr, tableRow) => {
+    if (tableErr || !tableRow) {
+      return;
+    }
+
+    database.get('SELECT COUNT(*) AS count FROM properties', [], (countErr, countRow) => {
+      if (countErr || countRow.count > 0) {
+        return;
+      }
+
+      database.run(
+        `INSERT INTO properties (title, location, price, type, bedrooms, bathrooms, area, status, description)
+         SELECT title, location, price, 'House', 0, 0, 0, status, 'Migrated from old houses table.' FROM houses`
+      );
+    });
+  });
+}
+
+db.serialize(() => {
+  ensurePropertiesTable(db);
+  addMissingPropertyColumns(db);
+  migrateHousesIntoProperties(db);
 });
 
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'House Sales System API',
-      version: '1.0.0',
-      description: 'Beginner-friendly Swagger docs for the House Sales System.'
+      title: 'Real Estate System API',
+      version: '2.0.0',
+      description: 'Beginner-friendly Swagger docs for the Real Estate System.'
     },
     servers: [
       {
@@ -55,7 +114,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(
   session({
-    secret: 'house-sales-secret',
+    secret: 'real-estate-secret',
     resave: false,
     saveUninitialized: false
   })
@@ -68,7 +127,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.use('/', houseRoutes);
+app.use('/', propertyRoutes);
 app.use('/api', apiRoutes);
 
 app.listen(PORT, () => {

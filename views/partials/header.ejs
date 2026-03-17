@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>House Sales System</title>
+  <title>Real Estate System</title>
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
   <header class="header">
-    <h1>House Sales System</h1>
+    <h1>Real Estate System</h1>
     <nav class="top-nav">
       <a href="/">Home</a>
 
       <% if (isLoggedIn) { %>
-        <a href="/add">Add House</a>
+        <a href="/add-property">Add Property</a>
         <form action="/logout" method="POST" class="inline-form">
           <button type="submit" class="nav-button">Logout</button>
         </form>

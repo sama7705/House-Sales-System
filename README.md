@@ -1,25 +1,22 @@
-# House Sales System
+# Real Estate System
 
-A simple Node.js project for managing house listings. Public users can view properties, and an admin user can log in to add houses, mark houses as sold, and delete houses.
+A simple Node.js project for managing property listings. Public users can browse properties, and an admin user can log in to add properties, mark them as sold, and delete them.
 
 ## Features
 
-- List all houses on the home page
+- List all properties on the home page
+- Property details page (`/properties/:id`)
 - Simple session-based admin login/logout
-- Add a new house from a form (admin only)
-- Mark a house as **Sold** (admin only)
-- Delete a house (admin only)
-- Use JSON API routes for testing or integration
-- Use Swagger UI for interactive API testing
+- Add a new property from a form (admin only)
+- Mark a property as **Sold** (admin only)
+- Delete a property (admin only)
+- JSON API routes for testing/integration
+- Swagger UI for interactive API testing
 
-## Admin Login (for now)
-
-The app currently uses one hardcoded admin account:
+## Admin Login
 
 - **Email:** `admin@example.com`
 - **Password:** `admin123`
-
-No registration is included yet.
 
 ## Tech Stack
 
@@ -27,7 +24,7 @@ No registration is included yet.
 - **Express.js**
 - **express-session**
 - **SQLite3**
-- **EJS** (server-side templates)
+- **EJS**
 - **Swagger UI + swagger-jsdoc**
 
 ## Project Structure
@@ -37,73 +34,63 @@ House-Sales-System/
 ├─ app.js
 ├─ package.json
 ├─ routes/
-│  ├─ houses.js
+│  ├─ properties.js
 │  └─ api.js
 ├─ views/
 │  ├─ index.ejs
-│  ├─ add-house.ejs
+│  ├─ add-property.ejs
+│  ├─ property-details.ejs
 │  ├─ login.ejs
 │  └─ partials/
 │     ├─ header.ejs
 │     └─ footer.ejs
 ├─ public/
 │  └─ style.css
-└─ houses.db (auto-created on first run)
+└─ houses.db (SQLite file)
 ```
 
-## How to Install
+## Database Schema
 
-1. Open a terminal in the project folder.
-2. Install dependencies:
+Main table is now `properties`:
+
+- `id INTEGER PRIMARY KEY AUTOINCREMENT`
+- `title TEXT NOT NULL`
+- `location TEXT NOT NULL`
+- `price REAL NOT NULL`
+- `type TEXT NOT NULL`
+- `bedrooms INTEGER NOT NULL`
+- `bathrooms INTEGER NOT NULL`
+- `area REAL NOT NULL`
+- `status TEXT NOT NULL DEFAULT 'Available'`
+- `description TEXT`
+
+## Main Web Routes
+
+- `GET /` → list properties
+- `GET /properties/:id` → property details page
+- `GET /login`, `POST /login`, `POST /logout`
+- `GET /add-property`, `POST /add-property` (admin only)
+- `POST /sold/:id` (admin only)
+- `POST /delete/:id` (admin only)
+
+## Main API Routes
+
+- `GET /api/properties`
+- `GET /api/properties/:id`
+- `POST /api/properties`
+- `PATCH /api/properties/:id`
+- `PATCH /api/properties/:id/sold`
+- `DELETE /api/properties/:id`
+
+## Run
 
 ```bash
 npm install
-```
-
-## How to Run
-
-Start the app:
-
-```bash
 npm start
 ```
 
-For auto-reload during development:
-
-```bash
-npm run dev
-```
-
-Server URL:
-
-```text
-http://localhost:3000
-```
-
-## Swagger Docs URL
+Swagger docs:
 
 ```text
 http://localhost:3000/api-docs
 ```
-
-## Main Web Routes
-
-- `GET /` → home page with house list (public)
-- `GET /login` → login page
-- `POST /login` → login action
-- `POST /logout` → logout action
-- `GET /add` → add-house form page (**admin only**)
-- `POST /add` → submit add-house form (**admin only**)
-- `POST /sold/:id` → mark house as sold (**admin only**)
-- `POST /delete/:id` → delete house (**admin only**)
-
-If a guest user opens a protected route, they are redirected to `/login`.
-
-## Main API Routes
-
-- `GET /api/houses` → list houses (JSON)
-- `POST /api/houses` → create a house (JSON)
-- `GET /api/houses/:id` → get one house by ID (JSON)
-- `PATCH /api/houses/:id` → update one house (JSON)
-- `PATCH /api/houses/:id/sold` → mark a house as sold (JSON)
-- `DELETE /api/houses/:id` → delete a house (JSON)
