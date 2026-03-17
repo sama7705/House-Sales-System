@@ -2,12 +2,55 @@ const express = require('express');
 
 const router = express.Router();
 
-function getAllProperties(db, callback) {
-  db.all('SELECT * FROM properties ORDER BY id DESC', [], callback);
-}
-
 function getPropertyById(db, id, callback) {
   db.get('SELECT * FROM properties WHERE id = ?', [id], callback);
+}
+
+function isValidNumber(value) {
+  return value !== undefined && value !== null && value !== '' && !Number.isNaN(Number(value));
+}
+
+function buildPropertyFilters(query) {
+  const {
+    search,
+    type,
+    status,
+    minPrice,
+    maxPrice
+  } = query;
+
+  const clauses = [];
+  const params = [];
+
+  if (search && search.trim()) {
+    clauses.push('(title LIKE ? OR location LIKE ?)');
+    params.push(`%${search.trim()}%`, `%${search.trim()}%`);
+  }
+
+  if (type && type.trim()) {
+    clauses.push('type = ?');
+    params.push(type.trim());
+  }
+
+  if (status && status.trim()) {
+    clauses.push('status = ?');
+    params.push(status.trim());
+  }
+
+  if (isValidNumber(minPrice)) {
+    clauses.push('price >= ?');
+    params.push(Number(minPrice));
+  }
+
+  if (isValidNumber(maxPrice)) {
+    clauses.push('price <= ?');
+    params.push(Number(maxPrice));
+  }
+
+  return {
+    whereClause: clauses.length > 0 ? ` WHERE ${clauses.join(' AND ')}` : '',
+    params
+  };
 }
 
 function isInvalidNumber(value) {
@@ -15,7 +58,9 @@ function isInvalidNumber(value) {
 }
 
 router.get('/properties', (req, res) => {
-  getAllProperties(req.db, (err, properties) => {
+  const { whereClause, params } = buildPropertyFilters(req.query);
+
+  req.db.all(`SELECT * FROM properties${whereClause} ORDER BY id DESC`, params, (err, properties) => {
     if (err) {
       return res.status(500).json({ error: 'Database error' });
     }

@@ -7,8 +7,64 @@ const ADMIN_USER = {
   password: 'admin123'
 };
 
-function getAllProperties(db, callback) {
-  db.all('SELECT * FROM properties ORDER BY id DESC', [], callback);
+function isValidNumber(value) {
+  return value !== undefined && value !== null && value !== '' && !Number.isNaN(Number(value));
+}
+
+function buildPropertyFilters(query) {
+  const {
+    search,
+    type,
+    status,
+    minPrice,
+    maxPrice
+  } = query;
+
+  const clauses = [];
+  const params = [];
+  const filters = {
+    search: search ? search.trim() : '',
+    type: type ? type.trim() : '',
+    status: status ? status.trim() : '',
+    minPrice: minPrice || '',
+    maxPrice: maxPrice || ''
+  };
+
+  if (filters.search) {
+    clauses.push('(title LIKE ? OR location LIKE ?)');
+    params.push(`%${filters.search}%`, `%${filters.search}%`);
+  }
+
+  if (filters.type) {
+    clauses.push('type = ?');
+    params.push(filters.type);
+  }
+
+  if (filters.status) {
+    clauses.push('status = ?');
+    params.push(filters.status);
+  }
+
+  if (isValidNumber(filters.minPrice)) {
+    clauses.push('price >= ?');
+    params.push(Number(filters.minPrice));
+  }
+
+  if (isValidNumber(filters.maxPrice)) {
+    clauses.push('price <= ?');
+    params.push(Number(filters.maxPrice));
+  }
+
+  return {
+    whereClause: clauses.length > 0 ? ` WHERE ${clauses.join(' AND ')}` : '',
+    params,
+    filters
+  };
+}
+
+function getFilteredProperties(db, query, callback) {
+  const { whereClause, params } = buildPropertyFilters(query);
+  db.all(`SELECT * FROM properties${whereClause} ORDER BY id DESC`, params, callback);
 }
 
 function getPropertyById(db, id, callback) {
@@ -206,11 +262,13 @@ function requireLogin(req, res, next) {
  *     summary: List all properties (EJS page)
  */
 router.get('/', (req, res) => {
-  getAllProperties(req.db, (err, properties) => {
+  getFilteredProperties(req.db, req.query, (err, properties) => {
     if (err) {
       return res.status(500).send('Database error');
     }
-    return res.render('index', { properties });
+
+    const { filters } = buildPropertyFilters(req.query);
+    return res.render('index', { properties, filters });
   });
 });
 
