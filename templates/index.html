@@ -1,12 +1,26 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Available Houses</h2>
+<h2>All Houses</h2>
 
 {% if houses %}
     <ul>
         {% for house in houses %}
-            <li>{{ house.title }} - ${{ house.price }}</li>
+            <li>
+                <strong>{{ house.title }}</strong> in {{ house.location }}
+                - ${{ house.price }}
+                <em>({{ house.status }})</em>
+
+                {% if house.status != 'Sold' %}
+                    <form method="post" action="{{ url_for('mark_sold', id=house.id) }}">
+                        <button type="submit">Mark as Sold</button>
+                    </form>
+                {% endif %}
+
+                <form method="post" action="{{ url_for('delete_house', id=house.id) }}">
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
         {% endfor %}
     </ul>
 {% else %}
