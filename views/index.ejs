@@ -1,44 +1,48 @@
 <%- include('partials/header') %>
 
-<h2>All Houses</h2>
+<h2>All Properties</h2>
 
 <% if (!isLoggedIn) { %>
-  <p class="info">You are viewing as a guest. Login to add, sell, or delete houses.</p>
+  <p class="info">You are viewing as a guest. Login to add, sell, or delete properties.</p>
 <% } %>
 
-<% if (houses.length === 0) { %>
-  <p>No houses found.</p>
+<% if (properties.length === 0) { %>
+  <p>No properties found.</p>
 <% } else { %>
   <table>
     <thead>
       <tr>
-        <th>ID</th>
         <th>Title</th>
         <th>Location</th>
+        <th>Type</th>
+        <th>Beds/Baths</th>
+        <th>Area</th>
         <th>Price</th>
         <th>Status</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
-      <% houses.forEach((house) => { %>
+      <% properties.forEach((property) => { %>
         <tr>
-          <td><%= house.id %></td>
-          <td><%= house.title %></td>
-          <td><%= house.location %></td>
-          <td>$<%= Number(house.price).toFixed(2) %></td>
+          <td><a href="/properties/<%= property.id %>"><%= property.title %></a></td>
+          <td><%= property.location %></td>
+          <td><%= property.type %></td>
+          <td><%= property.bedrooms %> / <%= property.bathrooms %></td>
+          <td><%= Number(property.area).toFixed(2) %> m²</td>
+          <td>$<%= Number(property.price).toFixed(2) %></td>
           <td>
-            <span class="status <%= house.status.toLowerCase() %>"><%= house.status %></span>
+            <span class="status <%= property.status.toLowerCase() %>"><%= property.status %></span>
           </td>
           <td class="actions">
             <% if (isLoggedIn) { %>
-              <% if (house.status === 'Available') { %>
-                <form action="/sold/<%= house.id %>" method="POST">
+              <% if (property.status === 'Available') { %>
+                <form action="/sold/<%= property.id %>" method="POST">
                   <button type="submit">Mark as Sold</button>
                 </form>
               <% } %>
 
-              <form action="/delete/<%= house.id %>" method="POST">
+              <form action="/delete/<%= property.id %>" method="POST">
                 <button type="submit" class="delete">Delete</button>
               </form>
             <% } else { %>

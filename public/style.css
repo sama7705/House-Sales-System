@@ -38,7 +38,7 @@ body {
 }
 
 .container {
-  max-width: 900px;
+  max-width: 980px;
   margin: 20px auto;
   background: white;
   padding: 20px;
@@ -93,10 +93,12 @@ button.delete {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-width: 420px;
+  max-width: 520px;
 }
 
-input {
+input,
+select,
+textarea {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -115,4 +117,9 @@ input {
 
 .muted {
   color: #777;
+}
+
+.details-card {
+  max-width: 600px;
+  line-height: 1.6;
 }
