@@ -1,51 +1,88 @@
-# House Sales System (Node.js + Express + SQLite + EJS)
+# House Sales System
 
-A very small, beginner-friendly house sales system.
+A simple Node.js project for managing house listings. You can view houses, add new ones, mark houses as sold, and delete houses using either web pages or API routes.
 
 ## Features
 
-1. Show all houses on the home page
-2. Add a new house
-3. Mark a house as sold
-4. Delete a house
-5. Show status as Available or Sold
+- List all houses on the home page
+- Add a new house from a form
+- Mark a house as **Sold**
+- Delete a house
+- Use JSON API routes for testing or integration
+- Use Swagger UI for interactive API testing
+
+## Tech Stack
+
+- **Node.js**
+- **Express.js**
+- **SQLite3**
+- **EJS** (server-side templates)
+- **Swagger UI + swagger-jsdoc**
 
 ## Project Structure
 
-- `app.js`
-- `package.json`
-- `houses.db` (created automatically on first run if it doesn't exist)
-- `routes/`
-- `views/`
-  - `partials/`
-  - `index.ejs`
-  - `add-house.ejs`
-- `public/`
-  - `style.css`
+```text
+House-Sales-System/
+├─ app.js
+├─ package.json
+├─ routes/
+│  └─ houses.js
+├─ views/
+│  ├─ index.ejs
+│  └─ add-house.ejs
+├─ public/
+│  └─ style.css
+└─ houses.db (auto-created on first run)
+```
 
-## Installation
+## How to Install
+
+1. Open a terminal in the project folder.
+2. Install dependencies:
 
 ```bash
 npm install
 ```
 
-## Run
+## How to Run
+
+Start the app:
 
 ```bash
 npm start
 ```
 
-Open: `http://localhost:3000`
+For auto-reload during development:
 
-## Database
+```bash
+npm run dev
+```
 
-Database file: `houses.db`
+Server URL:
 
-Table: `houses`
+```text
+http://localhost:3000
+```
 
-Columns:
-- `id INTEGER PRIMARY KEY AUTOINCREMENT`
-- `title TEXT NOT NULL`
-- `location TEXT NOT NULL`
-- `price REAL NOT NULL`
-- `status TEXT NOT NULL DEFAULT 'Available'`
+## Swagger Docs URL
+
+```text
+http://localhost:3000/api-docs
+```
+
+## Main Pages and API Routes
+
+### Browser pages
+
+- `GET /` → home page with house list
+- `GET /add` → add-house form page
+- `POST /add` → submit add-house form
+- `POST /sold/:id` → mark house as sold from UI
+- `POST /delete/:id` → delete house from UI
+
+### API routes
+
+- `GET /api/houses` → list houses (JSON)
+- `POST /api/houses` → create a house (JSON)
+- `PATCH /api/houses/:id/sold` → mark a house as sold (JSON)
+- `DELETE /api/houses/:id` → delete a house (JSON)
