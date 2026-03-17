@@ -41,6 +41,24 @@ button {
 }
 
 button {
-    width: 120px;
+    width: 140px;
     cursor: pointer;
+}
+
+ul {
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 16px;
+}
+
+li form {
+    display: inline-flex;
+    margin-top: 8px;
+    margin-right: 8px;
+}
+
+li button {
+    width: auto;
 }
