@@ -8,18 +8,20 @@
 </head>
 <body>
   <header class="header">
-    <h1>Real Estate System</h1>
-    <nav class="top-nav">
-      <a href="/">Home</a>
+    <div class="header-inner">
+      <h1><a href="/">Real Estate System</a></h1>
+      <nav class="top-nav">
+        <a href="/">Home</a>
 
-      <% if (isLoggedIn) { %>
-        <a href="/add-property">Add Property</a>
-        <form action="/logout" method="POST" class="inline-form">
-          <button type="submit" class="nav-button">Logout</button>
-        </form>
-      <% } else { %>
-        <a href="/login">Login</a>
-      <% } %>
-    </nav>
+        <% if (isLoggedIn) { %>
+          <a href="/add-property">Add Property</a>
+          <form action="/logout" method="POST" class="inline-form">
+            <button type="submit" class="nav-button">Logout</button>
+          </form>
+        <% } else { %>
+          <a href="/login">Login</a>
+        <% } %>
+      </nav>
+    </div>
   </header>
   <main class="container">
