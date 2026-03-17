@@ -8,24 +8,21 @@ DATABASE = 'houses.db'
 
 
 def init_db():
-    """Create the houses table if it does not already exist."""
-    connection = sqlite3.connect(DATABASE)
-
-    # Keep the schema setup simple and idempotent.
-    connection.execute(
-        '''
-        CREATE TABLE IF NOT EXISTS houses (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            location TEXT NOT NULL,
-            price REAL NOT NULL,
-            status TEXT NOT NULL DEFAULT 'Available'
+    """Create the houses table on startup when it does not exist."""
+    # Use a short-lived connection for one-time startup schema setup.
+    with sqlite3.connect(DATABASE) as connection:
+        # IF NOT EXISTS keeps this safe to run every time the app starts.
+        connection.execute(
+            '''
+            CREATE TABLE IF NOT EXISTS houses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                location TEXT NOT NULL,
+                price REAL NOT NULL,
+                status TEXT NOT NULL DEFAULT 'Available'
+            )
+            '''
         )
-        '''
-    )
-
-    connection.commit()
-    connection.close()
 
 
 # Initialize the database when the application starts.
