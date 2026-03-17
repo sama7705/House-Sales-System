@@ -84,5 +84,7 @@ http://localhost:3000/api-docs
 
 - `GET /api/houses` → list houses (JSON)
 - `POST /api/houses` → create a house (JSON)
+- `GET /api/houses/:id` → get one house by ID (JSON)
+- `PATCH /api/houses/:id` → update one house (JSON)
 - `PATCH /api/houses/:id/sold` → mark a house as sold (JSON)
 - `DELETE /api/houses/:id` → delete a house (JSON)
