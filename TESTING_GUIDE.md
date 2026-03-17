@@ -64,21 +64,36 @@ http://localhost:3000
 
 ---
 
-## API Testing with Swagger UI
+## API Testing with Swagger UI (Step-by-Step)
 
-1. Open Swagger UI:
+### Open Swagger UI
+
+1. Make sure the server is running (`npm start`).
+2. Open:
 
 ```text
 http://localhost:3000/api-docs
 ```
 
-2. Test endpoints in this order:
-   - `GET /api/houses`
-   - `POST /api/houses`
-   - `PATCH /api/houses/{id}/sold`
-   - `DELETE /api/houses/{id}`
+3. Expand the **API** tag section.
+4. For each endpoint, click **Try it out**, provide values, then click **Execute**.
 
-### Sample request body (POST /api/houses)
+### Recommended execution flow
+
+Use these endpoints in order so each step has data from the previous step:
+
+1. `GET /api/houses` (baseline list)
+2. `POST /api/houses` (create a test house)
+3. `GET /api/houses/{id}` (verify created house)
+4. `PATCH /api/houses/{id}` (partial update test)
+5. `PATCH /api/houses/{id}/sold` (mark sold)
+6. `DELETE /api/houses/{id}` (cleanup)
+
+> Tip: Copy the `id` returned by `POST /api/houses`; you will reuse it in later requests.
+
+### Example JSON request bodies
+
+#### `POST /api/houses`
 
 ```json
 {
@@ -88,12 +103,111 @@ http://localhost:3000/api-docs
 }
 ```
 
-### Expected API results
+#### `PATCH /api/houses/{id}` (update one or more fields)
 
-- `GET /api/houses` → `200 OK` with an array.
-- `POST /api/houses` → `201 Created` with new house JSON.
-- `PATCH /api/houses/{id}/sold` → `200 OK` and success message.
-- `DELETE /api/houses/{id}` → `200 OK` and success message.
+```json
+{
+  "price": 335000,
+  "status": "Available"
+}
+```
+
+#### Alternative `PATCH /api/houses/{id}` example
+
+```json
+{
+  "title": "City Apartment - Renovated",
+  "location": "Austin, TX",
+  "price": 350000,
+  "status": "Sold"
+}
+```
+
+### Expected responses
+
+#### `GET /api/houses`
+
+- Status: `200 OK`
+- Body (array, may be empty):
+
+```json
+[
+  {
+    "id": 1,
+    "title": "City Apartment",
+    "location": "Austin, TX",
+    "price": 320000,
+    "status": "Available"
+  }
+]
+```
+
+#### `POST /api/houses`
+
+- Status: `201 Created`
+- Body:
+
+```json
+{
+  "id": 2,
+  "title": "City Apartment",
+  "location": "Austin, TX",
+  "price": 320000,
+  "status": "Available"
+}
+```
+
+#### `GET /api/houses/{id}`
+
+- Status: `200 OK` when id exists
+- Body:
+
+```json
+{
+  "id": 2,
+  "title": "City Apartment",
+  "location": "Austin, TX",
+  "price": 320000,
+  "status": "Available"
+}
+```
+
+#### `PATCH /api/houses/{id}`
+
+- Status: `200 OK`
+- Body (updated object):
+
+```json
+{
+  "id": 2,
+  "title": "City Apartment - Renovated",
+  "location": "Austin, TX",
+  "price": 350000,
+  "status": "Sold"
+}
+```
+
+#### `PATCH /api/houses/{id}/sold`
+
+- Status: `200 OK`
+- Body:
+
+```json
+{
+  "message": "House marked as sold"
+}
+```
+
+#### `DELETE /api/houses/{id}`
+
+- Status: `200 OK`
+- Body:
+
+```json
+{
+  "message": "House deleted successfully"
+}
+```
 
 ---
 
@@ -103,12 +217,14 @@ http://localhost:3000/api-docs
 
 #### Browser form (`POST /add`)
 
-- Leave title/location/price empty and submit.
-- Expected: validation error message on form (HTTP 400).
+1. Open `http://localhost:3000/add`.
+2. Leave **Title**, **Location**, and/or **Price** blank.
+3. Submit.
+4. Expected result: validation error on the form (`400`).
 
 #### API (`POST /api/houses`)
 
-Use invalid body:
+Use this invalid request body:
 
 ```json
 {
@@ -118,22 +234,132 @@ Use invalid body:
 }
 ```
 
-Expected: `400 Bad Request`.
+Expected response:
+
+- Status: `400 Bad Request`
+- Body:
+
+```json
+{
+  "error": "Title, location, and valid price are required."
+}
+```
 
 ### 2) Invalid ID
 
-Test:
+Use a non-existent id such as `999999`.
 
-- `PATCH /api/houses/999999/sold`
-- `DELETE /api/houses/999999`
+#### `GET /api/houses/{id}`
 
-Expected: `404 Not Found` with `House not found`.
+- Request: `GET /api/houses/999999`
+- Expected:
+  - Status: `404 Not Found`
+  - Body:
 
-### 3) Duplicate-looking entries
+```json
+{
+  "error": "House not found"
+}
+```
 
-Create two houses with same title/location/price.
+#### `PATCH /api/houses/{id}`
 
-Expected:
+- Request: `PATCH /api/houses/999999`
+- Example body:
 
-- Both are allowed (no uniqueness rule in current app).
-- Each entry has a different `id`.
+```json
+{
+  "status": "Sold"
+}
+```
+
+- Expected:
+  - Status: `404 Not Found`
+  - Body:
+
+```json
+{
+  "error": "House not found"
+}
+```
+
+#### `PATCH /api/houses/{id}/sold`
+
+- Request: `PATCH /api/houses/999999/sold`
+- Expected:
+  - Status: `404 Not Found`
+  - Body:
+
+```json
+{
+  "error": "House not found"
+}
+```
+
+#### `DELETE /api/houses/{id}`
+
+- Request: `DELETE /api/houses/999999`
+- Expected:
+  - Status: `404 Not Found`
+  - Body:
+
+```json
+{
+  "error": "House not found"
+}
+```
+
+### 3) Additional negative API checks (optional but recommended)
+
+#### Missing patch fields
+
+- Request: `PATCH /api/houses/{id}` with empty body `{}`
+- Expected:
+  - Status: `400 Bad Request`
+  - Body:
+
+```json
+{
+  "error": "Provide at least one field to update."
+}
+```
+
+#### Invalid patch status
+
+- Request body:
+
+```json
+{
+  "status": "Pending"
+}
+```
+
+- Expected:
+  - Status: `400 Bad Request`
+  - Body:
+
+```json
+{
+  "error": "Status must be Available or Sold."
+}
+```
+
+#### Invalid patch price
+
+- Request body:
+
+```json
+{
+  "price": "not-a-number"
+}
+```
+
+- Expected:
+  - Status: `400 Bad Request`
+  - Body:
+
+```json
+{
+  "error": "Price must be a valid number."
+}
+```
