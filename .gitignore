@@ -1,23 +1,23 @@
-# Python cache files
-__pycache__/
-*.py[cod]
-*$py.class
+# Dependencies
+node_modules/
 
-# Virtual environment folders
-.venv/
-venv/
-env/
-ENV/
-
-# Environment variable files
+# Environment files
 .env
 .env.*
 *.env
 
-# SQLite database files
+# Database files
 *.db
 *.sqlite
 *.sqlite3
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
 # IDE/editor folders
 .vscode/
@@ -25,10 +25,7 @@ ENV/
 *.swp
 *.swo
 
-# OS-generated files
+# OS files
 .DS_Store
 Thumbs.db
 Desktop.ini
-
-# Node modules
-node_modules/
