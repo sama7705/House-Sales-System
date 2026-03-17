@@ -1,64 +1,107 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
-    background-color: #f5f5f5;
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    color: #222;
 }
 
 header {
-    background-color: #2f6fed;
-    color: white;
-    padding: 16px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #dddddd;
+    padding: 16px 20px;
 }
 
 header h1 {
-    margin: 0 0 8px;
+    margin: 0 0 10px;
+    font-size: 1.4rem;
 }
 
 nav a {
-    color: white;
-    margin-right: 12px;
+    margin-right: 14px;
+    color: #333;
     text-decoration: none;
 }
 
+nav a:hover {
+    text-decoration: underline;
+}
+
 main {
-    max-width: 700px;
+    max-width: 820px;
     margin: 24px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
+    padding: 0 16px 30px;
+}
+
+h2,
+h3 {
+    margin-top: 0;
 }
 
 form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    margin-top: 12px;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
 }
 
 input,
+select,
+textarea,
 button {
-    padding: 8px;
-    font-size: 16px;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    font-size: 1rem;
 }
 
 button {
-    width: 140px;
+    width: auto;
+    background-color: #2f6fed;
+    color: #fff;
+    border: none;
     cursor: pointer;
 }
 
-ul {
-    padding-left: 20px;
+button:hover {
+    background-color: #2559be;
 }
 
-li {
-    margin-bottom: 16px;
+section,
+.card {
+    background-color: #fff;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 14px;
 }
 
-li form {
-    display: inline-flex;
-    margin-top: 8px;
-    margin-right: 8px;
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border: 1px solid #dddddd;
 }
 
-li button {
-    width: auto;
+th,
+td {
+    padding: 10px;
+    border-bottom: 1px solid #eeeeee;
+    text-align: left;
+}
+
+th {
+    background-color: #fafafa;
+}
+
+p {
+    margin: 8px 0;
 }
