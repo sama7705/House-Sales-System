@@ -1,116 +1,147 @@
 <%- include('partials/header') %>
 
-<h2>All Properties</h2>
+<section class="hero">
+  <div>
+    <p class="eyebrow">Premium Real Estate Experience</p>
+    <h1>Find Your Dream Property</h1>
+    <p class="hero-subtitle">Explore modern homes, family apartments, and investment-ready spaces with refined search tools.</p>
+    <a href="#property-list" class="btn btn-primary">Browse Properties</a>
+  </div>
+</section>
 
 <% if (!isLoggedIn) { %>
-  <p class="info">You are viewing as a guest. Login to add, sell, or delete properties.</p>
+  <p class="info-banner">You are browsing as a guest. Login to add, mark as sold, or delete properties.</p>
 <% } %>
 
-<form action="/" method="GET" class="filters-form">
-  <div class="filters-grid">
-    <label>
-      Search (title or location)
-      <input
-        type="text"
-        name="search"
-        placeholder="e.g. Cairo"
-        value="<%= filters && filters.search ? filters.search : '' %>"
-      >
-    </label>
-
-    <label>
-      Property type
-      <select name="type">
-        <option value="">All types</option>
-        <option value="Apartment" <%= filters && filters.type === 'Apartment' ? 'selected' : '' %>>Apartment</option>
-        <option value="Villa" <%= filters && filters.type === 'Villa' ? 'selected' : '' %>>Villa</option>
-        <option value="House" <%= filters && filters.type === 'House' ? 'selected' : '' %>>House</option>
-        <option value="Chalet" <%= filters && filters.type === 'Chalet' ? 'selected' : '' %>>Chalet</option>
-        <option value="Office" <%= filters && filters.type === 'Office' ? 'selected' : '' %>>Office</option>
-      </select>
-    </label>
-
-    <label>
-      Status
-      <select name="status">
-        <option value="">All statuses</option>
-        <option value="Available" <%= filters && filters.status === 'Available' ? 'selected' : '' %>>Available</option>
-        <option value="Sold" <%= filters && filters.status === 'Sold' ? 'selected' : '' %>>Sold</option>
-      </select>
-    </label>
-
-    <label>
-      Min price
-      <input
-        type="number"
-        min="0"
-        step="1"
-        name="minPrice"
-        value="<%= filters && filters.minPrice ? filters.minPrice : '' %>"
-      >
-    </label>
-
-    <label>
-      Max price
-      <input
-        type="number"
-        min="0"
-        step="1"
-        name="maxPrice"
-        value="<%= filters && filters.maxPrice ? filters.maxPrice : '' %>"
-      >
-    </label>
+<section class="panel filters-panel">
+  <div class="panel-head">
+    <h2>Search & Filters</h2>
+    <p>Quickly narrow down listings by location, budget, and property details.</p>
   </div>
 
-  <div class="filters-actions">
-    <button type="submit">Apply Filters</button>
-    <a href="/" class="clear-filters">Clear</a>
+  <form action="/" method="GET" class="filters-form">
+    <div class="filters-grid">
+      <label>
+        Search (title or location)
+        <input
+          type="text"
+          name="search"
+          placeholder="e.g. Cairo, Villa"
+          value="<%= filters && filters.search ? filters.search : '' %>"
+        >
+      </label>
+
+      <label>
+        Property Type
+        <select name="type">
+          <option value="">All types</option>
+          <option value="Apartment" <%= filters && filters.type === 'Apartment' ? 'selected' : '' %>>Apartment</option>
+          <option value="Villa" <%= filters && filters.type === 'Villa' ? 'selected' : '' %>>Villa</option>
+          <option value="House" <%= filters && filters.type === 'House' ? 'selected' : '' %>>House</option>
+          <option value="Chalet" <%= filters && filters.type === 'Chalet' ? 'selected' : '' %>>Chalet</option>
+          <option value="Office" <%= filters && filters.type === 'Office' ? 'selected' : '' %>>Office</option>
+        </select>
+      </label>
+
+      <label>
+        Status
+        <select name="status">
+          <option value="">All statuses</option>
+          <option value="Available" <%= filters && filters.status === 'Available' ? 'selected' : '' %>>Available</option>
+          <option value="Sold" <%= filters && filters.status === 'Sold' ? 'selected' : '' %>>Sold</option>
+        </select>
+      </label>
+
+      <label>
+        Min Price
+        <input
+          type="number"
+          min="0"
+          step="1"
+          name="minPrice"
+          value="<%= filters && filters.minPrice ? filters.minPrice : '' %>"
+        >
+      </label>
+
+      <label>
+        Max Price
+        <input
+          type="number"
+          min="0"
+          step="1"
+          name="maxPrice"
+          value="<%= filters && filters.maxPrice ? filters.maxPrice : '' %>"
+        >
+      </label>
+    </div>
+
+    <div class="filters-actions">
+      <button type="submit" class="btn btn-primary">Apply Filters</button>
+      <a href="/" class="btn btn-ghost">Clear</a>
+    </div>
+  </form>
+</section>
+
+<section id="property-list" class="listings-section">
+  <div class="panel-head">
+    <h2>Featured Properties</h2>
+    <p><%= properties.length %> listing<%= properties.length === 1 ? '' : 's' %> available</p>
   </div>
-</form>
 
-<% if (properties.length === 0) { %>
-  <div class="empty-state">No properties available</div>
-<% } else { %>
-  <section class="property-grid">
-    <% properties.forEach((property) => { %>
-      <article class="property-card">
-        <img
-          src="<%= property.image_url || '/images/property-placeholder.svg' %>"
-          alt="<%= property.title %>"
-          class="property-thumb"
-          onerror="this.onerror=null;this.src='/images/property-placeholder.svg';"
-        />
-
-        <div class="property-content">
-          <div class="card-header-row">
-            <h3><%= property.title %></h3>
+  <% if (properties.length === 0) { %>
+    <div class="empty-state">
+      <h3>No properties found</h3>
+      <p>Try adjusting your filters or add a new property to start building your portfolio.</p>
+      <% if (isLoggedIn) { %>
+        <a href="/add-property" class="btn btn-primary">Add Property</a>
+      <% } %>
+    </div>
+  <% } else { %>
+    <div class="property-grid">
+      <% properties.forEach((property) => { %>
+        <article class="property-card">
+          <div class="card-media-wrap">
+            <img
+              src="<%= property.image_url || '/images/property-placeholder.svg' %>"
+              alt="<%= property.title %>"
+              class="property-thumb"
+              onerror="this.onerror=null;this.src='/images/property-placeholder.svg';"
+            />
             <span class="status <%= property.status.toLowerCase() %>"><%= property.status %></span>
           </div>
 
-          <p class="meta"><strong>Location:</strong> <%= property.location %></p>
-          <p class="meta"><strong>Type:</strong> <%= property.type %></p>
-          <p class="meta"><strong>Bedrooms / Bathrooms:</strong> <%= property.bedrooms %> / <%= property.bathrooms %></p>
-          <p class="price">$<%= Number(property.price).toFixed(2) %></p>
+          <div class="property-content">
+            <h3><%= property.title %></h3>
+            <p class="location">📍 <%= property.location %></p>
+            <p class="price">$<%= Number(property.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
 
-          <div class="actions">
-            <a href="/properties/<%= property.id %>" class="btn-link">View Details</a>
+            <div class="spec-grid">
+              <p><strong>Type</strong><span><%= property.type %></span></p>
+              <p><strong>Beds</strong><span><%= property.bedrooms %></span></p>
+              <p><strong>Baths</strong><span><%= property.bathrooms %></span></p>
+              <p><strong>Area</strong><span><%= Number(property.area).toFixed(2) %> m²</span></p>
+            </div>
 
-            <% if (isLoggedIn) { %>
-              <% if (property.status === 'Available') { %>
-                <form action="/sold/<%= property.id %>" method="POST">
-                  <button type="submit">Mark as Sold</button>
+            <div class="actions">
+              <a href="/properties/<%= property.id %>" class="btn btn-secondary">View Details</a>
+
+              <% if (isLoggedIn) { %>
+                <% if (property.status === 'Available') { %>
+                  <form action="/sold/<%= property.id %>" method="POST">
+                    <button type="submit" class="btn btn-soft">Mark as Sold</button>
+                  </form>
+                <% } %>
+
+                <form action="/delete/<%= property.id %>" method="POST">
+                  <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
               <% } %>
-
-              <form action="/delete/<%= property.id %>" method="POST">
-                <button type="submit" class="delete">Delete</button>
-              </form>
-            <% } %>
+            </div>
           </div>
-        </div>
-      </article>
-    <% }) %>
-  </section>
-<% } %>
+        </article>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
 
 <%- include('partials/footer') %>

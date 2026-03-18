@@ -1,54 +1,61 @@
 <%- include('partials/header') %>
 
-<h2>Add New Property</h2>
-
-<% if (error) { %>
-  <p class="error"><%= error %></p>
-<% } %>
-
-<form action="/add-property" method="POST" class="form-card">
-  <div class="form-grid">
-    <label for="title">Title</label>
-    <input type="text" id="title" name="title" value="<%= formData.title || '' %>" required />
-
-    <label for="location">Location</label>
-    <input type="text" id="location" name="location" value="<%= formData.location || '' %>" required />
-
-    <label for="price">Price</label>
-    <input type="number" id="price" name="price" step="0.01" min="0" value="<%= formData.price || '' %>" required />
-
-    <label for="type">Type</label>
-    <select id="type" name="type" required>
-      <option value="">Select property type</option>
-      <% ['Apartment', 'Villa', 'House', 'Chalet', 'Office'].forEach((propertyType) => { %>
-        <option value="<%= propertyType %>" <%= formData.type === propertyType ? 'selected' : '' %>><%= propertyType %></option>
-      <% }) %>
-    </select>
-
-    <label for="bedrooms">Bedrooms</label>
-    <input type="number" id="bedrooms" name="bedrooms" min="0" value="<%= formData.bedrooms || '' %>" required />
-
-    <label for="bathrooms">Bathrooms</label>
-    <input type="number" id="bathrooms" name="bathrooms" min="0" value="<%= formData.bathrooms || '' %>" required />
-
-    <label for="area">Area (m²)</label>
-    <input type="number" id="area" name="area" step="0.01" min="0" value="<%= formData.area || '' %>" required />
-
-    <label for="image_url">Image URL</label>
-    <input
-      type="url"
-      id="image_url"
-      name="image_url"
-      placeholder="https://example.com/house.jpg"
-      value="<%= formData.image_url || '' %>"
-    />
-    <p class="field-hint">Optional. If left empty, we will show a default placeholder image.</p>
-
-    <label for="description">Description</label>
-    <textarea id="description" name="description" rows="4"><%= formData.description || '' %></textarea>
+<section class="panel form-panel">
+  <div class="panel-head">
+    <p class="eyebrow">Management</p>
+    <h1>Add New Property</h1>
+    <p>Fill in the details below to publish a high-quality listing.</p>
   </div>
 
-  <button type="submit">Add Property</button>
-</form>
+  <% if (error) { %>
+    <p class="error-banner"><%= error %></p>
+  <% } %>
+
+  <form action="/add-property" method="POST" class="property-form">
+    <div class="form-grid-modern">
+      <label for="title">Title</label>
+      <input type="text" id="title" name="title" value="<%= formData.title || '' %>" required />
+
+      <label for="location">Location</label>
+      <input type="text" id="location" name="location" value="<%= formData.location || '' %>" required />
+
+      <label for="price">Price</label>
+      <input type="number" id="price" name="price" step="0.01" min="0" value="<%= formData.price || '' %>" required />
+
+      <label for="type">Type</label>
+      <select id="type" name="type" required>
+        <option value="">Select property type</option>
+        <% ['Apartment', 'Villa', 'House', 'Chalet', 'Office'].forEach((propertyType) => { %>
+          <option value="<%= propertyType %>" <%= formData.type === propertyType ? 'selected' : '' %>><%= propertyType %></option>
+        <% }) %>
+      </select>
+
+      <label for="bedrooms">Bedrooms</label>
+      <input type="number" id="bedrooms" name="bedrooms" min="0" value="<%= formData.bedrooms || '' %>" required />
+
+      <label for="bathrooms">Bathrooms</label>
+      <input type="number" id="bathrooms" name="bathrooms" min="0" value="<%= formData.bathrooms || '' %>" required />
+
+      <label for="area">Area (m²)</label>
+      <input type="number" id="area" name="area" step="0.01" min="0" value="<%= formData.area || '' %>" required />
+
+      <label for="image_url">Image URL</label>
+      <input
+        type="url"
+        id="image_url"
+        name="image_url"
+        placeholder="https://example.com/property.jpg"
+        value="<%= formData.image_url || '' %>"
+      />
+
+      <p class="field-hint">Optional: if empty, a clean placeholder image will be shown automatically.</p>
+
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="5"><%= formData.description || '' %></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Property</button>
+  </form>
+</section>
 
 <%- include('partials/footer') %>

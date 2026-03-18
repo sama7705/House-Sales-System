@@ -7,21 +7,33 @@
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <header class="header">
-    <div class="header-inner">
-      <h1><a href="/">Real Estate System</a></h1>
+  <header class="site-header">
+    <div class="shell nav-shell">
+      <a href="/" class="brand">
+        <span class="brand-mark">HS</span>
+        <span class="brand-text">House Sales</span>
+      </a>
+
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation" />
+      <label for="nav-toggle" class="nav-toggle-label">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+
       <nav class="top-nav">
         <a href="/">Home</a>
 
         <% if (isLoggedIn) { %>
           <a href="/add-property">Add Property</a>
           <form action="/logout" method="POST" class="inline-form">
-            <button type="submit" class="nav-button">Logout</button>
+            <button type="submit" class="btn btn-ghost">Logout</button>
           </form>
         <% } else { %>
-          <a href="/login">Login</a>
+          <a href="/login" class="btn btn-primary nav-login">Login</a>
         <% } %>
       </nav>
     </div>
   </header>
-  <main class="container">
+
+  <main class="shell page-shell">
