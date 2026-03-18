@@ -1,173 +1,189 @@
-# House Sales System
+# 🏠 Real Estate Management System
 
-A beginner-friendly **Real Estate / House Listings** web app built with Node.js and Express.
-It includes a public browsing experience and an admin workflow for managing property listings.
+## 📌 Project Description
+A beginner-friendly real estate management system built with **Node.js**, **Express**, **SQLite**, and **EJS**. The application allows visitors to browse property listings through a simple web interface, while admins can log in to manage listings, update property status, and remove entries. It also includes a documented JSON API with **Swagger UI** for easy testing.
 
----
+## 🎯 Project Objective
+The goal of this project is to provide a practical full-stack example of a real estate platform that demonstrates:
+- server-side rendering with EJS,
+- property management with CRUD operations,
+- session-based admin authentication,
+- persistent storage with SQLite,
+- and API documentation for learning and testing.
 
-## ✨ Overview
+## ✨ Features
 
-This project is designed as a portfolio-ready full-stack starter:
+### 🌐 Public Features
+- View all available property listings.
+- Open a detailed page for each property.
+- Search and filter properties by keyword, type, status, and price range.
+- See key property details such as location, price, area, bedrooms, and bathrooms.
 
-- Server-rendered pages with **EJS**
-- Persistent data using **SQLite**
-- Session-based admin authentication
-- REST-style JSON API for integration/testing
-- Interactive API documentation via Swagger
+### 🛠️ Admin Features
+- Secure admin login using session-based authentication.
+- Add new property listings from a web form.
+- Mark listed properties as **Sold**.
+- Delete properties from the system.
+- Manage listings through both the web interface and API.
 
----
+### 🔌 API Features
+- Get all properties as JSON.
+- Get a single property by ID.
+- Create a new property.
+- Update a property partially with `PATCH`.
+- Mark a property as sold.
+- Delete a property.
+- Explore and test endpoints with Swagger UI.
 
-## 🧰 Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Runtime | Node.js |
-| Server | Express.js |
-| Views | EJS |
-| Database | SQLite3 |
-| Auth Session | express-session |
-| API Docs | swagger-ui-express + swagger-jsdoc |
-
----
-
-## 🚀 Getting Started
-
-### 1) Install dependencies
-
-```bash
-npm install
-```
-
-### 2) Start the app
-
-```bash
-npm start
-```
-
-### 3) Open in browser
-
-```text
-App:     http://localhost:3000
-Swagger: http://localhost:3000/api-docs
-```
-
----
-
-## 🔐 Admin Access (Demo)
-
-Use these credentials to access admin-only actions:
+## 🔐 Admin Login
+Use the following demo credentials to access admin-only features:
 
 - **Email:** `admin@example.com`
 - **Password:** `admin123`
 
----
+## 🧰 Tech Stack
 
-## ✅ Public Features
+### Backend
+- Node.js
+- Express.js
 
-- Browse all property listings
-- View detailed information for each property
-- Filter/search properties (via query params and API)
-- View status (Available / Sold)
+### Frontend
+- EJS
+- HTML/CSS
 
-## 🛠️ Admin Features
+### Database
+- SQLite3
 
-- Log in / log out
-- Add new property listings
-- Mark properties as **Sold**
-- Delete properties
-- Create and update properties via API
+### Auth
+- express-session
 
----
+### API
+- REST-style JSON endpoints
+- swagger-jsdoc
+- swagger-ui-express
 
-## 🌐 Web Routes
+## 🏗️ System Architecture
 
-### Public Routes
+### Frontend Layer
+- EJS templates render the user interface on the server.
+- Public users can browse listings and view property details.
+- Admin users can access protected management actions after login.
+
+### Backend Layer
+- Express handles routing, form submission, API responses, and session management.
+- Separate route modules manage web routes and API routes.
+- Validation checks help ensure required property data is provided.
+
+### Database Layer
+- SQLite stores property records in a local database file.
+- The app creates the `properties` table automatically if it does not exist.
+- Sample property data is inserted when the database is empty.
+
+## 🗃️ Database Schema
+The main table used in this project is:
+
+- **properties**
+  - `id` - Primary key
+  - `title` - Property title
+  - `location` - Property location
+  - `price` - Property price
+  - `type` - Property type
+  - `bedrooms` - Number of bedrooms
+  - `bathrooms` - Number of bathrooms
+  - `area` - Property size
+  - `status` - Availability status (`Available` or `Sold`)
+  - `description` - Property description
+  - `image_url` - Optional property image URL
+
+## 🛣️ Web Routes
 
 | Method | Route | Description |
 |---|---|---|
-| GET | `/` | Home page with property list |
-| GET | `/properties/:id` | Property details page |
-| GET | `/login` | Admin login page |
-| POST | `/login` | Submit admin login |
-| POST | `/logout` | Admin logout |
-
-### Admin-Protected Routes
-
-| Method | Route | Description |
-|---|---|---|
-| GET | `/add-property` | Form to add a new property |
-| POST | `/add-property` | Create a new property |
+| GET | `/` | Show the homepage with all property listings and filters |
+| GET | `/properties/:id` | Show detailed information for one property |
+| GET | `/login` | Show the admin login page |
+| POST | `/login` | Authenticate the admin user |
+| POST | `/logout` | Log out the current admin session |
+| GET | `/add-property` | Show the add-property form for logged-in admins |
+| POST | `/add-property` | Create a new property from the admin form |
 | POST | `/sold/:id` | Mark a property as sold |
 | POST | `/delete/:id` | Delete a property |
 
----
-
-## 📡 API Routes (JSON)
+## 🔗 API Routes
 
 | Method | Route | Description |
 |---|---|---|
-| GET | `/api/properties` | List properties |
-| GET | `/api/properties/:id` | Get one property |
-| POST | `/api/properties` | Create a property |
-| PATCH | `/api/properties/:id` | Partially update a property |
-| PATCH | `/api/properties/:id/sold` | Mark property as sold |
+| GET | `/api/properties` | Return all properties as JSON, with optional filters |
+| GET | `/api/properties/:id` | Return one property by ID |
+| POST | `/api/properties` | Create a new property |
+| PATCH | `/api/properties/:id` | Update selected property fields |
+| PATCH | `/api/properties/:id/sold` | Mark a property as sold |
 | DELETE | `/api/properties/:id` | Delete a property |
 
-> Tip: Use Swagger UI at `/api-docs` to test API endpoints interactively.
+## 📘 Swagger Documentation
+Interactive API documentation is available at:
 
----
+**URL:** `http://localhost:3000/api-docs`
 
-## 🗃️ Database Notes
-
-The app uses a SQLite database file (`houses.db`) and ensures a `properties` table exists at startup.
-
-Key fields include:
-
-- `id`, `title`, `location`, `price`
-- `type`, `bedrooms`, `bathrooms`, `area`
-- `status` (`Available` or `Sold`)
-- `description`, `image_url`
-
----
-
-## 📁 Project Structure
-
-```text
-House-Sales-System/
-├─ app.js
-├─ package.json
-├─ routes/
-│  ├─ properties.js
-│  └─ api.js
-├─ views/
-│  ├─ index.ejs
-│  ├─ add-property.ejs
-│  ├─ property-details.ejs
-│  ├─ login.ejs
-│  └─ partials/
-│     ├─ header.ejs
-│     └─ footer.ejs
-├─ public/
-│  └─ style.css
-└─ houses.db
+## ▶️ How to Run
+```bash
+npm install
+npm start
 ```
 
----
+Then open:
 
-## 🎯 Portfolio Value
+- **Application:** `http://localhost:3000`
+- **Swagger UI:** `http://localhost:3000/api-docs`
 
-This project demonstrates practical, beginner-friendly skills:
+## ✅ Testing
 
-- CRUD operations with a real database
-- Route design for both UI and API
-- Session-based authentication flow
-- Server-side rendering with reusable views
-- API documentation and testing workflow
+### Web Testing
+- Open the homepage and verify listings appear correctly.
+- Test the search and filter options.
+- Open a property details page.
+- Log in as admin and test add, sold, and delete actions.
+- Log out and confirm protected admin pages require login.
 
-If you're building your portfolio, this is a solid base to extend with:
+### Swagger / API Testing
+- Open Swagger UI and test each API endpoint.
+- Verify `GET` requests return valid property data.
+- Test `POST` to create a new property.
+- Test `PATCH` to update property fields.
+- Test `PATCH /api/properties/:id/sold` to change the status.
+- Test `DELETE` to remove a property.
 
-- image uploads
-- role-based access
-- deployment (Render/Railway/Fly)
-- automated tests
+### Edge Cases
+- Try submitting missing required fields.
+- Try using an invalid property ID.
+- Try updating a property with invalid numeric values.
+- Try logging in with incorrect admin credentials.
+- Try accessing `/add-property` without logging in.
 
+## 🎨 Frontend Design
+The frontend is designed to be clean and simple for beginners:
+- A homepage with property cards and filter controls.
+- A dedicated details page for each property.
+- A straightforward admin login page.
+- An easy-to-use form for adding new properties.
+- Clear status labels to distinguish **Available** and **Sold** listings.
+
+## 🔄 System Workflow
+1. The server starts and connects to the SQLite database.
+2. The app ensures the `properties` table exists.
+3. Sample properties are added if the database is empty.
+4. Visitors browse listings on the homepage.
+5. Users can open a property details page for more information.
+6. Admins log in using the demo credentials.
+7. Logged-in admins can add, update, sell, or delete properties.
+8. API consumers can interact with the same property data through JSON endpoints.
+9. Swagger UI provides a simple interface for testing the API.
+
+## 📝 Notes
+- This project uses **session-based authentication** for admin access.
+- Property data is stored locally in `houses.db`.
+- The system is designed to be simple, readable, and beginner-friendly.
+- Swagger documentation is included to make API learning easier.
+
+## 👤 Author
+Created as a beginner-friendly **Real Estate Management System** project using Node.js, Express, SQLite, EJS, express-session, and Swagger.
