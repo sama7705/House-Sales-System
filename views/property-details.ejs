@@ -1,11 +1,16 @@
 <%- include('partials/header') %>
 
+<% const heroImageSrc = property.image_url && property.image_url.trim()
+  ? property.image_url.trim()
+  : '/images/property-placeholder.svg'; %>
+
 <section class="details-card">
   <div class="details-media">
     <img
-      src="<%= property.image_url || '/images/property-placeholder.svg' %>"
+      src="<%= heroImageSrc %>"
       alt="<%= property.title %>"
       class="property-hero"
+      loading="eager"
       onerror="this.onerror=null;this.src='/images/property-placeholder.svg';"
     />
   </div>

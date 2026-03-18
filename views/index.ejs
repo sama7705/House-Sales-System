@@ -99,12 +99,16 @@
   <% } else { %>
     <div class="property-grid">
       <% properties.forEach((property) => { %>
+        <% const imageSrc = property.image_url && property.image_url.trim()
+          ? property.image_url.trim()
+          : '/images/property-placeholder.svg'; %>
         <article class="property-card">
           <div class="card-media-wrap">
             <img
-              src="<%= property.image_url || '/images/property-placeholder.svg' %>"
+              src="<%= imageSrc %>"
               alt="<%= property.title %>"
               class="property-thumb"
+              loading="lazy"
               onerror="this.onerror=null;this.src='/images/property-placeholder.svg';"
             />
             <span class="status <%= property.status.toLowerCase() %>"><%= property.status %></span>

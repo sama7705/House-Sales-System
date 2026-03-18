@@ -355,6 +355,7 @@ textarea:focus {
   width: 100%;
   height: 220px;
   object-fit: cover;
+  object-position: center;
   display: block;
   background: #f0efec;
 }
@@ -497,13 +498,15 @@ textarea:focus {
 .details-media {
   border-radius: var(--radius-md);
   overflow: hidden;
+  aspect-ratio: 16 / 10;
+  min-height: 340px;
 }
 
 .property-hero {
   width: 100%;
   height: 100%;
-  min-height: 340px;
   object-fit: cover;
+  object-position: center;
   display: block;
   background: #f2f1ee;
 }
