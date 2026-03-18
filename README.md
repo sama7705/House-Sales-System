@@ -1,9 +1,9 @@
-# 🏠 Real Estate Management System
+# Real Estate Management System
 
-## 📌 Project Description
+##  Project Description
 A beginner-friendly real estate management system built with **Node.js**, **Express**, **SQLite**, and **EJS**. The application allows visitors to browse property listings through a simple web interface, while admins can log in to manage listings, update property status, and remove entries. It also includes a documented JSON API with **Swagger UI** for easy testing.
 
-## 🎯 Project Objective
+##  Project Objective
 The goal of this project is to provide a practical full-stack example of a real estate platform that demonstrates:
 - server-side rendering with EJS,
 - property management with CRUD operations,
@@ -11,15 +11,15 @@ The goal of this project is to provide a practical full-stack example of a real 
 - persistent storage with SQLite,
 - and API documentation for learning and testing.
 
-## ✨ Features
+## Features
 
-### 🌐 Public Features
+###  Public Features
 - View all available property listings.
 - Open a detailed page for each property.
 - Search and filter properties by keyword, type, status, and price range.
 - See key property details such as location, price, area, bedrooms, and bathrooms.
 
-### 🛠️ Admin Features
+### Admin Features
 - Secure admin login using session-based authentication.
 - Add new property listings from a web form.
 - Mark listed properties as **Sold**.
@@ -35,13 +35,13 @@ The goal of this project is to provide a practical full-stack example of a real 
 - Delete a property.
 - Explore and test endpoints with Swagger UI.
 
-## 🔐 Admin Login
+## Admin Login
 Use the following demo credentials to access admin-only features:
 
 - **Email:** `admin@example.com`
 - **Password:** `admin123`
 
-## 🧰 Tech Stack
+## Tech Stack
 
 ### Backend
 - Node.js
@@ -62,7 +62,7 @@ Use the following demo credentials to access admin-only features:
 - swagger-jsdoc
 - swagger-ui-express
 
-## 🏗️ System Architecture
+## System Architecture
 
 ### Frontend Layer
 - EJS templates render the user interface on the server.
@@ -79,7 +79,7 @@ Use the following demo credentials to access admin-only features:
 - The app creates the `properties` table automatically if it does not exist.
 - Sample property data is inserted when the database is empty.
 
-## 🗃️ Database Schema
+## Database Schema
 The main table used in this project is:
 
 - **properties**
@@ -95,7 +95,7 @@ The main table used in this project is:
   - `description` - Property description
   - `image_url` - Optional property image URL
 
-## 🛣️ Web Routes
+## Web Routes
 
 | Method | Route | Description |
 |---|---|---|
@@ -109,7 +109,7 @@ The main table used in this project is:
 | POST | `/sold/:id` | Mark a property as sold |
 | POST | `/delete/:id` | Delete a property |
 
-## 🔗 API Routes
+## API Routes
 
 | Method | Route | Description |
 |---|---|---|
@@ -120,12 +120,12 @@ The main table used in this project is:
 | PATCH | `/api/properties/:id/sold` | Mark a property as sold |
 | DELETE | `/api/properties/:id` | Delete a property |
 
-## 📘 Swagger Documentation
+## Swagger Documentation
 Interactive API documentation is available at:
 
 **URL:** `http://localhost:3000/api-docs`
 
-## ▶️ How to Run
+## How to Run
 ```bash
 npm install
 npm start
@@ -136,7 +136,7 @@ Then open:
 - **Application:** `http://localhost:3000`
 - **Swagger UI:** `http://localhost:3000/api-docs`
 
-## ✅ Testing
+## Testing
 
 ### Web Testing
 - Open the homepage and verify listings appear correctly.
@@ -160,7 +160,7 @@ Then open:
 - Try logging in with incorrect admin credentials.
 - Try accessing `/add-property` without logging in.
 
-## 🎨 Frontend Design
+## Frontend Design
 The frontend is designed to be clean and simple for beginners:
 - A homepage with property cards and filter controls.
 - A dedicated details page for each property.
@@ -168,7 +168,7 @@ The frontend is designed to be clean and simple for beginners:
 - An easy-to-use form for adding new properties.
 - Clear status labels to distinguish **Available** and **Sold** listings.
 
-## 🔄 System Workflow
+## System Workflow
 1. The server starts and connects to the SQLite database.
 2. The app ensures the `properties` table exists.
 3. Sample properties are added if the database is empty.
@@ -179,11 +179,11 @@ The frontend is designed to be clean and simple for beginners:
 8. API consumers can interact with the same property data through JSON endpoints.
 9. Swagger UI provides a simple interface for testing the API.
 
-## 📝 Notes
+## Notes
 - This project uses **session-based authentication** for admin access.
 - Property data is stored locally in `houses.db`.
 - The system is designed to be simple, readable, and beginner-friendly.
 - Swagger documentation is included to make API learning easier.
 
-## 👤 Author
-Created as a beginner-friendly **Real Estate Management System** project using Node.js, Express, SQLite, EJS, express-session, and Swagger.
+## Author
+Sama Mohamed Maher
