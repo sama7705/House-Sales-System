@@ -11,26 +11,47 @@
   </div>
 
   <div class="details-content">
-    <div class="card-header-row">
-      <h2><%= property.title %></h2>
-      <span class="status <%= property.status.toLowerCase() %>"><%= property.status %></span>
+    <div class="details-head">
+      <p class="eyebrow">Property Overview</p>
+      <h1><%= property.title %></h1>
+      <div class="badge-row">
+        <span class="pill"><%= property.type %></span>
+        <span class="status <%= property.status.toLowerCase() %>"><%= property.status %></span>
+      </div>
     </div>
 
+    <p class="location">📍 <%= property.location %></p>
+    <p class="price">$<%= Number(property.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
+
     <div class="details-grid">
-      <p><strong>Location</strong><span><%= property.location %></span></p>
-      <p><strong>Type</strong><span><%= property.type %></span></p>
       <p><strong>Bedrooms</strong><span><%= property.bedrooms %></span></p>
       <p><strong>Bathrooms</strong><span><%= property.bathrooms %></span></p>
       <p><strong>Area</strong><span><%= Number(property.area).toFixed(2) %> m²</span></p>
-      <p><strong>Price</strong><span>$<%= Number(property.price).toFixed(2) %></span></p>
+      <p><strong>Type</strong><span><%= property.type %></span></p>
+      <p><strong>Status</strong><span><%= property.status %></span></p>
+      <p><strong>Location</strong><span><%= property.location %></span></p>
     </div>
 
-    <div class="description-box">
+    <section class="description-box">
       <h3>Description</h3>
       <p><%= property.description || 'No description provided.' %></p>
-    </div>
+    </section>
 
-    <p><a href="/" class="back-link">← Back to all properties</a></p>
+    <div class="actions">
+      <a href="/" class="btn btn-ghost">← Back to Listings</a>
+
+      <% if (isLoggedIn) { %>
+        <% if (property.status === 'Available') { %>
+          <form action="/sold/<%= property.id %>" method="POST">
+            <button type="submit" class="btn btn-soft">Mark as Sold</button>
+          </form>
+        <% } %>
+
+        <form action="/delete/<%= property.id %>" method="POST">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      <% } %>
+    </div>
   </div>
 </section>
 
