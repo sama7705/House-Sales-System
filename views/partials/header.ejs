@@ -25,15 +25,22 @@
         <a href="/">Home</a>
 
         <% if (isLoggedIn) { %>
-          <a href="/add-property">Add Property</a>
+          <a href="/dashboard">Dashboard</a>
+          <% if (currentUser && currentUser.role === 'admin') { %>
+            <a href="/add-property">Add Property</a>
+          <% } %>
           <form action="/logout" method="POST" class="inline-form">
             <button type="submit" class="btn btn-ghost">Logout</button>
           </form>
         <% } else { %>
-          <a href="/login" class="btn btn-primary nav-login">Login</a>
+          <a href="/login">Login</a>
+          <a href="/register" class="btn btn-primary nav-login">Register</a>
         <% } %>
       </nav>
     </div>
   </header>
 
   <main class="shell page-shell">
+    <% if (flash) { %>
+      <div class="alert <%= flash.type === 'success' ? 'alert-success' : 'alert-error' %>"><%= flash.text %></div>
+    <% } %>

@@ -92,7 +92,7 @@
     <div class="empty-state">
       <h3>No properties found</h3>
       <p>Try adjusting your filters or add a new property to start building your portfolio.</p>
-      <% if (isLoggedIn) { %>
+      <% if (isLoggedIn && currentUser && currentUser.role === 'admin') { %>
         <a href="/add-property" class="btn btn-primary">Add Property</a>
       <% } %>
     </div>
@@ -129,7 +129,7 @@
             <div class="actions">
               <a href="/properties/<%= property.id %>" class="btn btn-secondary">View Details</a>
 
-              <% if (isLoggedIn) { %>
+              <% if (isLoggedIn && currentUser && currentUser.role === 'admin') { %>
                 <% if (property.status === 'Available') { %>
                   <form action="/sold/<%= property.id %>" method="POST">
                     <button type="submit" class="btn btn-soft">Mark as Sold</button>

@@ -45,7 +45,7 @@
     <div class="actions">
       <a href="/" class="btn btn-ghost">← Back to Listings</a>
 
-      <% if (isLoggedIn) { %>
+      <% if (isLoggedIn && currentUser && currentUser.role === 'admin') { %>
         <% if (property.status === 'Available') { %>
           <form action="/sold/<%= property.id %>" method="POST">
             <button type="submit" class="btn btn-soft">Mark as Sold</button>
