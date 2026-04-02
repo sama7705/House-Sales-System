@@ -3,6 +3,14 @@
   <footer class="site-footer">
     <div class="shell footer-shell">
       <p>© <%= new Date().getFullYear() %> House Sales System. Built for modern property discovery.</p>
+      <div class="footer-links">
+        <a href="/">Listings</a>
+        <% if (isLoggedIn) { %>
+          <a href="/dashboard">Dashboard</a>
+        <% } else { %>
+          <a href="/login">Login</a>
+        <% } %>
+      </div>
     </div>
   </footer>
 </body>
