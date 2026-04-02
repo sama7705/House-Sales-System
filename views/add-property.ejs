@@ -13,45 +13,63 @@
 
   <form action="/add-property" method="POST" class="property-form">
     <div class="form-grid-modern">
-      <label for="title">Title</label>
-      <input type="text" id="title" name="title" value="<%= formData.title || '' %>" required />
+      <div class="form-field">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" value="<%= formData.title || '' %>" required />
+      </div>
 
-      <label for="location">Location</label>
-      <input type="text" id="location" name="location" value="<%= formData.location || '' %>" required />
+      <div class="form-field">
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location" value="<%= formData.location || '' %>" required />
+      </div>
 
-      <label for="price">Price</label>
-      <input type="number" id="price" name="price" step="0.01" min="0" value="<%= formData.price || '' %>" required />
+      <div class="form-field">
+        <label for="price">Price</label>
+        <input type="number" id="price" name="price" step="0.01" min="0" value="<%= formData.price || '' %>" required />
+      </div>
 
-      <label for="type">Type</label>
-      <select id="type" name="type" required>
-        <option value="">Select property type</option>
-        <% ['Apartment', 'Villa', 'House', 'Chalet', 'Office'].forEach((propertyType) => { %>
-          <option value="<%= propertyType %>" <%= formData.type === propertyType ? 'selected' : '' %>><%= propertyType %></option>
-        <% }) %>
-      </select>
+      <div class="form-field">
+        <label for="type">Type</label>
+        <select id="type" name="type" required>
+          <option value="">Select property type</option>
+          <% ['Apartment', 'Villa', 'House', 'Chalet', 'Office'].forEach((propertyType) => { %>
+            <option value="<%= propertyType %>" <%= formData.type === propertyType ? 'selected' : '' %>><%= propertyType %></option>
+          <% }) %>
+        </select>
+      </div>
 
-      <label for="bedrooms">Bedrooms</label>
-      <input type="number" id="bedrooms" name="bedrooms" min="0" value="<%= formData.bedrooms || '' %>" required />
+      <div class="form-field">
+        <label for="bedrooms">Bedrooms</label>
+        <input type="number" id="bedrooms" name="bedrooms" min="0" value="<%= formData.bedrooms || '' %>" required />
+      </div>
 
-      <label for="bathrooms">Bathrooms</label>
-      <input type="number" id="bathrooms" name="bathrooms" min="0" value="<%= formData.bathrooms || '' %>" required />
+      <div class="form-field">
+        <label for="bathrooms">Bathrooms</label>
+        <input type="number" id="bathrooms" name="bathrooms" min="0" value="<%= formData.bathrooms || '' %>" required />
+      </div>
 
-      <label for="area">Area (m²)</label>
-      <input type="number" id="area" name="area" step="0.01" min="0" value="<%= formData.area || '' %>" required />
+      <div class="form-field">
+        <label for="area">Area (m²)</label>
+        <input type="number" id="area" name="area" step="0.01" min="0" value="<%= formData.area || '' %>" required />
+      </div>
 
-      <label for="image_url">Image URL</label>
-      <input
-        type="url"
-        id="image_url"
-        name="image_url"
-        placeholder="https://example.com/property.jpg"
-        value="<%= formData.image_url || '' %>"
-      />
+      <div class="form-field">
+        <label for="image_url">Image URL</label>
+        <input
+          type="url"
+          id="image_url"
+          name="image_url"
+          placeholder="https://example.com/property.jpg"
+          value="<%= formData.image_url || '' %>"
+        />
+      </div>
 
       <p class="field-hint">Optional: if empty, a clean placeholder image will be shown automatically.</p>
 
-      <label for="description">Description</label>
-      <textarea id="description" name="description" rows="5"><%= formData.description || '' %></textarea>
+      <div class="form-field full">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="5"><%= formData.description || '' %></textarea>
+      </div>
     </div>
 
     <button type="submit" class="btn btn-primary">Add Property</button>

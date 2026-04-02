@@ -22,18 +22,18 @@
       </label>
 
       <nav class="top-nav">
-        <a href="/">Home</a>
+        <a href="/" class="nav-link">Home</a>
 
         <% if (isLoggedIn) { %>
-          <a href="/dashboard">Dashboard</a>
+          <a href="/dashboard" class="nav-link">Dashboard</a>
           <% if (currentUser && currentUser.role === 'admin') { %>
-            <a href="/add-property">Add Property</a>
+            <a href="/add-property" class="nav-link">Add Property</a>
           <% } %>
           <form action="/logout" method="POST" class="inline-form">
             <button type="submit" class="btn btn-ghost">Logout</button>
           </form>
         <% } else { %>
-          <a href="/login">Login</a>
+          <a href="/login" class="nav-link">Login</a>
           <a href="/register" class="btn btn-primary nav-login">Register</a>
         <% } %>
       </nav>
