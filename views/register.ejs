@@ -1,0 +1,41 @@
+<%- include('partials/header') %>
+
+<section class="auth-wrap">
+  <article class="auth-card">
+    <p class="eyebrow">Create Account</p>
+    <h1>Join House Sales</h1>
+    <p class="muted">Register to browse and manage your account. Admin role can manage listings.</p>
+
+    <% if (errors && errors.length > 0) { %>
+      <div class="error-banner">
+        <ul>
+          <% errors.forEach((error) => { %>
+            <li><%= error %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } %>
+
+    <form action="/register" method="POST" class="stack-form" id="register-form">
+      <label for="name">Full name</label>
+      <input type="text" id="name" name="name" minlength="2" value="<%= formData.name || '' %>" required />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" value="<%= formData.email || '' %>" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" minlength="6" required />
+
+      <label for="role">Role</label>
+      <select id="role" name="role" required>
+        <option value="user" <%= formData.role !== 'admin' ? 'selected' : '' %>>User</option>
+        <option value="admin" <%= formData.role === 'admin' ? 'selected' : '' %>>Admin</option>
+      </select>
+
+      <button type="submit" class="btn btn-primary btn-block">Register</button>
+      <p class="muted small-text">Already have an account? <a href="/login">Login</a></p>
+    </form>
+  </article>
+</section>
+
+<%- include('partials/footer') %>

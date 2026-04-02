@@ -1,0 +1,62 @@
+<%- include('partials/header') %>
+
+<section class="panel">
+  <div class="panel-head row-between">
+    <div>
+      <p class="eyebrow">Admin Panel</p>
+      <h1>Management Dashboard</h1>
+      <p>Manage properties and monitor registered users.</p>
+    </div>
+    <a href="/add-property" class="btn btn-primary">Add Property</a>
+  </div>
+
+  <h2 class="section-title">Properties</h2>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th><th>Title</th><th>Location</th><th>Status</th><th>Price</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% properties.forEach((property) => { %>
+          <tr>
+            <td><%= property.id %></td>
+            <td><a href="/properties/<%= property.id %>"><%= property.title %></a></td>
+            <td><%= property.location %></td>
+            <td><span class="status <%= property.status.toLowerCase() %>"><%= property.status %></span></td>
+            <td>$<%= Number(property.price).toLocaleString() %></td>
+            <td class="action-cell">
+              <a href="/properties/<%= property.id %>/edit" class="btn btn-secondary">Edit</a>
+              <form action="/delete/<%= property.id %>" method="POST">
+                <button type="submit" class="btn btn-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="section-title">Users</h2>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr>
+      </thead>
+      <tbody>
+        <% users.forEach((user) => { %>
+          <tr>
+            <td><%= user.id %></td>
+            <td><%= user.name %></td>
+            <td><%= user.email %></td>
+            <td><span class="pill"><%= user.role %></span></td>
+            <td><%= user.created_at %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

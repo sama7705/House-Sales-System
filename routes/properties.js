@@ -1,11 +1,7 @@
 const express = require('express');
 
 const router = express.Router();
-
-const ADMIN_USER = {
-  email: 'admin@example.com',
-  password: 'admin123'
-};
+const passwordHasher = require('../utils/password');
 
 function isValidNumber(value) {
   return value !== undefined && value !== null && value !== '' && !Number.isNaN(Number(value));
@@ -91,13 +87,6 @@ function hasInvalidRequiredFields(propertyData) {
     || Number.isNaN(Number(bathrooms))
     || Number.isNaN(Number(area))
   );
-}
-
-function requireLogin(req, res, next) {
-  if (!req.session.user) {
-    return res.redirect('/login');
-  }
-  return next();
 }
 
 /**
@@ -282,13 +271,6 @@ router.get('/', (req, res) => {
   });
 });
 
-/**
- * @swagger
- * /properties/{id}:
- *   get:
- *     tags: [Web]
- *     summary: Show one property details page
- */
 router.get('/properties/:id', (req, res) => {
   getPropertyById(req.db, req.params.id, (err, property) => {
     if (err) {
@@ -296,12 +278,55 @@ router.get('/properties/:id', (req, res) => {
     }
 
     if (!property) {
-      return res.status(404).send('Property not found');
+      return res.status(404).render('404');
     }
 
     return res.render('property-details', { property });
   });
 });
+
+function requireLogin(req, res, next) {
+  if (!req.session.user) {
+    req.session.flash = { type: 'error', text: 'Please login first.' };
+    return res.redirect('/login');
+  }
+  return next();
+}
+
+function requireAdmin(req, res, next) {
+  if (!req.session.user || req.session.user.role !== 'admin') {
+    req.session.flash = { type: 'error', text: 'Admin access is required for this action.' };
+    return res.redirect('/');
+  }
+  return next();
+}
+
+function normalizeUserInput({ name, email, password, role }) {
+  return {
+    name: name ? name.trim() : '',
+    email: email ? email.trim().toLowerCase() : '',
+    password: password || '',
+    role: role === 'admin' ? 'admin' : 'user'
+  };
+}
+
+function validateRegisterInput(input) {
+  const errors = [];
+
+  if (!input.name || input.name.length < 2) {
+    errors.push('Name must be at least 2 characters long.');
+  }
+
+  if (!/^\S+@\S+\.\S+$/.test(input.email)) {
+    errors.push('Please enter a valid email address.');
+  }
+
+  if (!input.password || input.password.length < 6) {
+    errors.push('Password must be at least 6 characters long.');
+  }
+
+  return errors;
+}
 
 router.get('/login', (req, res) => {
   if (req.session.user) {
@@ -312,16 +337,125 @@ router.get('/login', (req, res) => {
 });
 
 router.post('/login', (req, res) => {
-  const { email, password } = req.body;
+  const email = req.body.email ? req.body.email.trim().toLowerCase() : '';
+  const password = req.body.password || '';
 
-  if (email === ADMIN_USER.email && password === ADMIN_USER.password) {
-    req.session.user = { email: ADMIN_USER.email };
+  if (!email || !password) {
+    return res.status(400).render('login', {
+      error: 'Email and password are required.',
+      formData: { email }
+    });
+  }
+
+  return req.db.get('SELECT id, name, email, password_hash, role FROM users WHERE email = ?', [email], (err, user) => {
+    if (err) {
+      return res.status(500).render('login', {
+        error: 'Database error. Please try again.',
+        formData: { email }
+      });
+    }
+
+    if (!user) {
+      return res.status(401).render('login', {
+        error: 'Invalid email or password.',
+        formData: { email }
+      });
+    }
+
+    return passwordHasher.compare(password, user.password_hash, (compareErr, isMatch) => {
+      if (compareErr || !isMatch) {
+        return res.status(401).render('login', {
+          error: 'Invalid email or password.',
+          formData: { email }
+        });
+      }
+
+      req.session.user = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      };
+      req.session.flash = { type: 'success', text: `Welcome back, ${user.name}!` };
+      return res.redirect('/');
+    });
+  });
+});
+
+router.get('/register', (req, res) => {
+  if (req.session.user) {
     return res.redirect('/');
   }
 
-  return res.status(401).render('login', {
-    error: 'Invalid email or password.',
-    formData: { email }
+  return res.render('register', { errors: [], formData: {} });
+});
+
+router.post('/register', (req, res) => {
+  const input = normalizeUserInput(req.body);
+  const errors = validateRegisterInput(input);
+
+  if (errors.length > 0) {
+    return res.status(400).render('register', {
+      errors,
+      formData: {
+        name: input.name,
+        email: input.email,
+        role: input.role
+      }
+    });
+  }
+
+  return req.db.get('SELECT id FROM users WHERE email = ?', [input.email], (checkErr, existingUser) => {
+    if (checkErr) {
+      return res.status(500).render('register', {
+        errors: ['Database error. Please try again.'],
+        formData: { name: input.name, email: input.email, role: input.role }
+      });
+    }
+
+    if (existingUser) {
+      return res.status(409).render('register', {
+        errors: ['This email is already registered.'],
+        formData: { name: input.name, email: input.email, role: input.role }
+      });
+    }
+
+    return passwordHasher.hash(input.password, 10, (hashErr, hash) => {
+      if (hashErr) {
+        return res.status(500).render('register', {
+          errors: ['Could not secure password. Please try again.'],
+          formData: { name: input.name, email: input.email, role: input.role }
+        });
+      }
+
+      return req.db.run(
+        'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
+        [input.name, input.email, hash, input.role],
+        function onCreate(insertErr) {
+          if (insertErr) {
+            return res.status(500).render('register', {
+              errors: ['Could not create account. Please try again.'],
+              formData: { name: input.name, email: input.email, role: input.role }
+            });
+          }
+
+          req.session.user = {
+            id: this.lastID,
+            name: input.name,
+            email: input.email,
+            role: input.role
+          };
+          req.session.flash = { type: 'success', text: 'Registration completed successfully.' };
+          return res.redirect('/');
+        }
+      );
+    });
+  });
+});
+
+router.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/login');
   });
 });
 
@@ -331,25 +465,27 @@ router.post('/logout', (req, res) => {
   });
 });
 
-/**
- * @swagger
- * /add-property:
- *   get:
- *     tags: [Web]
- *     summary: Show add property page
- */
-router.get('/add-property', requireLogin, (req, res) => {
+router.get('/dashboard', requireLogin, requireAdmin, (req, res) => {
+  req.db.all('SELECT * FROM properties ORDER BY id DESC', [], (err, properties) => {
+    if (err) {
+      return res.status(500).send('Database error');
+    }
+
+    return req.db.all('SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC', [], (usersErr, users) => {
+      if (usersErr) {
+        return res.status(500).send('Database error');
+      }
+
+      return res.render('dashboard', { properties, users });
+    });
+  });
+});
+
+router.get('/add-property', requireLogin, requireAdmin, (req, res) => {
   res.render('add-property', { error: null, formData: {} });
 });
 
-/**
- * @swagger
- * /add-property:
- *   post:
- *     tags: [Web]
- *     summary: Create a new property (form submit)
- */
-router.post('/add-property', requireLogin, (req, res) => {
+router.post('/add-property', requireLogin, requireAdmin, (req, res) => {
   const {
     title,
     location,
@@ -389,26 +525,92 @@ router.post('/add-property', requireLogin, (req, res) => {
       if (err) {
         return res.status(500).send('Database error');
       }
-      return res.redirect('/');
+      req.session.flash = { type: 'success', text: 'Property added successfully.' };
+      return res.redirect('/dashboard');
     }
   );
 });
 
-router.post('/sold/:id', requireLogin, (req, res) => {
+router.get('/properties/:id/edit', requireLogin, requireAdmin, (req, res) => {
+  getPropertyById(req.db, req.params.id, (err, property) => {
+    if (err) {
+      return res.status(500).send('Database error');
+    }
+
+    if (!property) {
+      return res.status(404).render('404');
+    }
+
+    return res.render('edit-property', { error: null, property });
+  });
+});
+
+router.post('/properties/:id/edit', requireLogin, requireAdmin, (req, res) => {
+  const {
+    title,
+    location,
+    price,
+    type,
+    bedrooms,
+    bathrooms,
+    area,
+    status,
+    description,
+    image_url
+  } = req.body;
+
+  if (hasInvalidRequiredFields(req.body) || !['Available', 'Sold'].includes(status)) {
+    return res.status(400).render('edit-property', {
+      error: 'Please complete all required fields with valid values.',
+      property: { ...req.body, id: req.params.id }
+    });
+  }
+
+  return req.db.run(
+    `UPDATE properties
+     SET title = ?, location = ?, price = ?, type = ?, bedrooms = ?, bathrooms = ?, area = ?, status = ?, description = ?, image_url = ?
+     WHERE id = ?`,
+    [
+      title.trim(),
+      location.trim(),
+      Number(price),
+      type,
+      Number(bedrooms),
+      Number(bathrooms),
+      Number(area),
+      status,
+      description ? description.trim() : null,
+      image_url ? image_url.trim() : null,
+      req.params.id
+    ],
+    (err) => {
+      if (err) {
+        return res.status(500).send('Database error');
+      }
+
+      req.session.flash = { type: 'success', text: 'Property updated successfully.' };
+      return res.redirect('/dashboard');
+    }
+  );
+});
+
+router.post('/sold/:id', requireLogin, requireAdmin, (req, res) => {
   req.db.run('UPDATE properties SET status = ? WHERE id = ?', ['Sold', req.params.id], (err) => {
     if (err) {
       return res.status(500).send('Database error');
     }
-    return res.redirect('/');
+    req.session.flash = { type: 'success', text: 'Property marked as sold.' };
+    return res.redirect('back');
   });
 });
 
-router.post('/delete/:id', requireLogin, (req, res) => {
+router.post('/delete/:id', requireLogin, requireAdmin, (req, res) => {
   req.db.run('DELETE FROM properties WHERE id = ?', [req.params.id], (err) => {
     if (err) {
       return res.status(500).send('Database error');
     }
-    return res.redirect('/');
+    req.session.flash = { type: 'success', text: 'Property deleted successfully.' };
+    return res.redirect('/dashboard');
   });
 });
 

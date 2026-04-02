@@ -5,6 +5,8 @@ const sqlite3 = require('sqlite3').verbose();
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 
+const passwordHasher = require('./utils/password');
+
 const propertyRoutes = require('./routes/properties');
 const apiRoutes = require('./routes/api');
 
@@ -30,6 +32,38 @@ function ensurePropertiesTable(database) {
       image_url TEXT DEFAULT NULL
     )
   `);
+}
+
+function ensureUsersTable(database) {
+  database.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('admin', 'user')),
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+}
+
+function seedDefaultAdminUser(database) {
+  database.get('SELECT id FROM users WHERE email = ?', ['admin@example.com'], (err, row) => {
+    if (err || row) {
+      return;
+    }
+
+    passwordHasher.hash('admin123', 10, (hashErr, adminPasswordHash) => {
+      if (hashErr) {
+        return;
+      }
+
+      database.run(
+        'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
+        ['System Admin', 'admin@example.com', adminPasswordHash, 'admin']
+      );
+    });
+  });
 }
 
 function addMissingPropertyColumns(database) {
@@ -184,9 +218,11 @@ function seedSampleProperties(database) {
 
 db.serialize(() => {
   ensurePropertiesTable(db);
+  ensureUsersTable(db);
   addMissingPropertyColumns(db);
   migrateHousesIntoProperties(db);
   seedSampleProperties(db);
+  seedDefaultAdminUser(db);
 });
 
 const swaggerOptions = {
@@ -214,7 +250,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
 app.use(
   session({
@@ -227,12 +263,19 @@ app.use(
 app.use((req, res, next) => {
   req.db = db;
   res.locals.isLoggedIn = Boolean(req.session.user);
+  res.locals.currentUser = req.session.user || null;
+  res.locals.flash = req.session.flash || null;
+  delete req.session.flash;
   next();
 });
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/', propertyRoutes);
 app.use('/api', apiRoutes);
+
+app.use((req, res) => {
+  res.status(404).render('404');
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
